@@ -6707,7 +6707,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 	TitleBar.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
 	TitleBar.BackgroundTransparency = 1
 	TitleBar.Size = UDim2.new(1, 0, 0, 30)
-	TitleBar.Font = NeverLose.BuiltInBold
+	TitleBar.FontFace = NeverLose.BuiltInBold
 	TitleBar.Text = "  Admin Presence (Double Click)"
 	TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
 	TitleBar.TextSize = 12
@@ -6818,7 +6818,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 			NameLabel.BackgroundTransparency = 1
 			NameLabel.Position = UDim2.new(0, 45, 0, 5)
 			NameLabel.Size = UDim2.new(1, -50, 0, 15)
-			NameLabel.Font = NeverLose.BuiltInBold
+			NameLabel.FontFace = NeverLose.BuiltInBold
 			NameLabel.Text = string.format("(%s) %s", player.DisplayName, player.Name)
 			NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 			NameLabel.TextSize = 12
@@ -6829,7 +6829,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 			TimeLabel.BackgroundTransparency = 1
 			TimeLabel.Position = UDim2.new(0, 45, 0, 20)
 			TimeLabel.Size = UDim2.new(1, -50, 0, 15)
-			TimeLabel.Font = NeverLose.BuiltInRegular
+			TimeLabel.FontFace = NeverLose.BuiltInRegular
 			TimeLabel.Text = "Joined: " .. data.time
 			TimeLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
 			TimeLabel.TextSize = 11
@@ -6856,12 +6856,13 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 			end)
 			
 			if success and rank >= rankId then
+				local displayRank = type(rankName) == "table" and (rankName[rank] or "Admin") or rankName
 				admins[player] = {time = os.date("%H:%M:%S")}
 				updateAdminUI()
 				
 				Notifier.new({
 					Title = string.format("(%s) %s", player.DisplayName, player.Name),
-					Content = isJoin and ("Joined at " .. admins[player].time) or ("In Server (" .. rankName .. ")"),
+					Content = isJoin and ("Joined at " .. admins[player].time) or ("In Server (" .. displayRank .. ")"),
 					Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
 					Duration = 10
 				})
