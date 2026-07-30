@@ -6680,46 +6680,215 @@ function NeverLose:CreateIndicator()
 end;
 
 function NeverLose:AdminPresence(groupId, rankId, rankName)
-	local function checkPlayer(player, isJoin)
+	local Notifier = NeverLose:CreateNotification()
+	
+	local MainFrame = Instance.new("Frame")
+	MainFrame.Name = NeverLose.RandomString()
+	MainFrame.Parent = NeverLose.ScreenGui
+	MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
+	MainFrame.Position = UDim2.new(0, 50, 0.5, 0)
+	MainFrame.Size = UDim2.new(0, 250, 0, 30)
+	MainFrame.Visible = false
+	MainFrame.Active = false
+	MainFrame.ZIndex = 500
+
+	local UICorner = Instance.new("UICorner")
+	UICorner.CornerRadius = UDim.new(0, 5)
+	UICorner.Parent = MainFrame
+
+	local UIStroke = Instance.new("UIStroke")
+	UIStroke.Color = Color3.fromRGB(45, 48, 58)
+	UIStroke.Transparency = 0.65
+	UIStroke.Parent = MainFrame
+
+	local TitleBar = Instance.new("TextButton")
+	TitleBar.Name = NeverLose.RandomString()
+	TitleBar.Parent = MainFrame
+	TitleBar.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+	TitleBar.BackgroundTransparency = 1
+	TitleBar.Size = UDim2.new(1, 0, 0, 30)
+	TitleBar.Font = NeverLose.BuiltInBold
+	TitleBar.Text = "  Admin Presence (Double Click)"
+	TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TitleBar.TextSize = 12
+	TitleBar.TextXAlignment = Enum.TextXAlignment.Left
+
+	local ContentFrame = Instance.new("Frame")
+	ContentFrame.Name = NeverLose.RandomString()
+	ContentFrame.Parent = MainFrame
+	ContentFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
+	ContentFrame.BackgroundTransparency = 1
+	ContentFrame.Position = UDim2.new(0, 0, 0, 30)
+	ContentFrame.Size = UDim2.new(1, 0, 1, -30)
+	ContentFrame.ClipsDescendants = true
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.Parent = ContentFrame
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 5)
+
+	local dragging = false
+	local dragInput, mousePos, framePos
+
+	NeverLose:AddSignal(TitleBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			mousePos = input.Position
+			framePos = MainFrame.Position
+			
+			local con
+			con = input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+					con:Disconnect()
+				end
+			end)
+		end
+	end))
+
+	NeverLose:AddSignal(UserInputService.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			dragInput = input
+		end
+	end))
+
+	NeverLose:AddSignal(RunService.RenderStepped:Connect(function()
+		if dragging and dragInput then
+			local delta = dragInput.Position - mousePos
+			MainFrame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+		end
+	end))
+
+	local isCollapsed = false
+	local lastClick = 0
+	NeverLose:AddSignal(TitleBar.MouseButton1Click:Connect(function()
+		if tick() - lastClick < 0.3 then
+			isCollapsed = not isCollapsed
+			if isCollapsed then
+				MainFrame.Size = UDim2.new(0, 250, 0, 30)
+				ContentFrame.Visible = false
+			else
+				ContentFrame.Visible = true
+				if #activeCards > 0 then
+					MainFrame.Size = UDim2.new(0, 250, 0, 35 + (#activeCards * 45))
+				end
+			end
+		end
+		lastClick = tick()
+	end))
+
+	local admins = {}
+	local activeCards = {}
+
+	local function updateAdminUI()
+		for _, card in pairs(activeCards) do
+			card:Destroy()
+		end
+		table.clear(activeCards)
+		
+		local count = 0
+		for player, data in pairs(admins) do
+			count = count + 1
+			
+			local Card = Instance.new("Frame")
+			Card.Name = NeverLose.RandomString()
+			Card.Parent = ContentFrame
+			Card.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+			Card.BackgroundTransparency = 0.5
+			Card.Size = UDim2.new(1, -10, 0, 40)
+			Card.Position = UDim2.new(0, 5, 0, 0)
+			
+			local CardCorner = Instance.new("UICorner")
+			CardCorner.CornerRadius = UDim.new(0, 5)
+			CardCorner.Parent = Card
+			
+			local Avatar = Instance.new("ImageLabel")
+			Avatar.Parent = Card
+			Avatar.BackgroundTransparency = 1
+			Avatar.Position = UDim2.new(0, 5, 0, 5)
+			Avatar.Size = UDim2.new(0, 30, 0, 30)
+			Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
+			
+			local AvatarCorner = Instance.new("UICorner")
+			AvatarCorner.CornerRadius = UDim.new(0, 5)
+			AvatarCorner.Parent = Avatar
+			
+			local NameLabel = Instance.new("TextLabel")
+			NameLabel.Parent = Card
+			NameLabel.BackgroundTransparency = 1
+			NameLabel.Position = UDim2.new(0, 45, 0, 5)
+			NameLabel.Size = UDim2.new(1, -50, 0, 15)
+			NameLabel.Font = NeverLose.BuiltInBold
+			NameLabel.Text = string.format("(%s) %s", player.DisplayName, player.Name)
+			NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			NameLabel.TextSize = 12
+			NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+			
+			local TimeLabel = Instance.new("TextLabel")
+			TimeLabel.Parent = Card
+			TimeLabel.BackgroundTransparency = 1
+			TimeLabel.Position = UDim2.new(0, 45, 0, 20)
+			TimeLabel.Size = UDim2.new(1, -50, 0, 15)
+			TimeLabel.Font = NeverLose.BuiltInRegular
+			TimeLabel.Text = "Joined: " .. data.time
+			TimeLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+			TimeLabel.TextSize = 11
+			TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
+			
+			table.insert(activeCards, Card)
+		end
+		
+		if count > 0 then
+			MainFrame.Visible = true
+			if not isCollapsed then
+				MainFrame.Size = UDim2.new(0, 250, 0, 35 + (count * 45))
+			end
+		else
+			MainFrame.Visible = false
+		end
+	end
+
+	local function checkAdmin(player, isJoin)
 		if player == LocalPlayer then return end
 		task.spawn(function()
 			local success, rank = pcall(function()
 				return player:GetRankInGroup(groupId)
 			end)
+			
 			if success and rank >= rankId then
-				NeverLose:Notification({
-					Title = isJoin and "Admin Joined" or "Admin Presence",
-					Content = string.format("Admin %s (%s) %s!", player.Name, rankName, isJoin and "joined the game" or "is in the game"),
-					Icon = "triangle-exclamation",
-					Color = "Red"
+				admins[player] = {time = os.date("%H:%M:%S")}
+				updateAdminUI()
+				
+				Notifier.new({
+					Title = string.format("(%s) %s", player.DisplayName, player.Name),
+					Content = isJoin and ("Joined at " .. admins[player].time) or ("In Server (" .. rankName .. ")"),
+					Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+					Duration = 10
 				})
 			end
 		end)
 	end
 
 	for _, player in ipairs(Players:GetPlayers()) do
-		checkPlayer(player, false)
+		checkAdmin(player, false)
 	end
 
 	NeverLose:AddSignal(Players.PlayerAdded:Connect(function(player)
-		checkPlayer(player, true)
+		checkAdmin(player, true)
 	end))
 
 	NeverLose:AddSignal(Players.PlayerRemoving:Connect(function(player)
-		if player == LocalPlayer then return end
-		task.spawn(function()
-			local success, rank = pcall(function()
-				return player:GetRankInGroup(groupId)
-			end)
-			if success and rank >= rankId then
-				NeverLose:Notification({
-					Title = "Admin Left",
-					Content = string.format("Admin %s (%s) left the game.", player.Name, rankName),
-					Icon = "shield-check",
-					Color = "Green"
-				})
-			end
-		end)
+		if admins[player] then
+			admins[player] = nil
+			updateAdminUI()
+			
+			Notifier.new({
+				Title = string.format("(%s) %s", player.DisplayName, player.Name),
+				Content = "Left at " .. os.date("%H:%M:%S"),
+				Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+				Duration = 7
+			})
+		end
 	end))
 end
 
