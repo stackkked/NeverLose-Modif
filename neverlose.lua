@@ -6856,8 +6856,9 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 			end)
 			
 			local minRank = type(rankId) == "number" and rankId or 255
-			if success and rank >= minRank then
-				local displayRank = type(rankName) == "table" and (rankName[rank] or "Admin") or rankName
+			local actualRank = type(rank) == "number" and rank or 0
+			if success and actualRank >= minRank then
+				local displayRank = type(rankName) == "table" and (rankName[actualRank] or "Admin") or rankName
 				admins[player] = {time = os.date("%H:%M:%S")}
 				updateAdminUI()
 				
