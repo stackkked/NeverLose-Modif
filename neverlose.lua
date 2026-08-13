@@ -4,7 +4,7 @@
         License: MIT
     Discord: https://arceney.win/discord
     Other-Projects: https://4lpaca.win
-        FORK BY: stackkked
+        FORK BY: shakedows
 ]]
 
 do
@@ -6681,449 +6681,918 @@ function NeverLose:CreateIndicator()
 end;
 
 function NeverLose:AdminPresence(groupId, rankId, rankName)
-        local Notifier = NeverLose:CreateNotification()
+	local Notifier = NeverLose:CreateNotification()
+	local Logging = NeverLose:CreateLogger()
 
-        -- ============================================
-        -- COMPACT ADMIN PRESENCE WIDGET
-        -- ============================================
-        -- Одна карточка с переключением через < >
-        -- Стиль совпадает с главным меню NeverLose
+	-- ============================================
+	-- STATE
+	-- ============================================
+	local admins = {}
+	local adminList = {}
+	local currentIndex = 1
+	local widgetVisible = false
+	local isSpectating = false
 
-        local MainFrame = Instance.new("Frame")
-        MainFrame.Name = NeverLose.RandomString()
-        MainFrame.Parent = NeverLose.ScreenGui
-        MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
-        MainFrame.BackgroundTransparency = 0.05
-        MainFrame.BorderSizePixel = 0
-        MainFrame.Position = UDim2.new(0, 50, 0.5, -90)
-        MainFrame.Size = UDim2.new(0, 280, 0, 30)
-        MainFrame.Visible = false
-        MainFrame.ZIndex = 500
+	-- ============================================
+	-- DIMENSIONS
+	-- ============================================
+	local CARD_W = 285
+	local SINGLE_H = 144
+	local MULTI_H = 170
+	local ExpandTween = TweenInfo.new(0.2, Enum.EasingStyle.Quint)
+	local ExpandTweenSlow = TweenInfo.new(0.3, Enum.EasingStyle.Quint)
 
-        local MainCorner = Instance.new("UICorner")
-        MainCorner.CornerRadius = UDim.new(0, 6)
-        MainCorner.Parent = MainFrame
+	local function getCardHeight()
+		return #adminList > 1 and MULTI_H or SINGLE_H
+	end
 
-        local MainStroke = Instance.new("UIStroke")
-        MainStroke.Color = Color3.fromRGB(45, 48, 58)
-        MainStroke.Transparency = 0.35
-        MainStroke.Parent = MainFrame
+	-- ============================================
+	-- MAIN FRAME — expands from center (all 4 sides)
+	-- ============================================
+	local MainFrame = Instance.new("Frame")
+	MainFrame.Name = NeverLose.RandomString()
+	MainFrame.Parent = NeverLose.ScreenGui
+	MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
+	MainFrame.BackgroundTransparency = 1
+	MainFrame.BorderSizePixel = 0
+	MainFrame.Position = UDim2.new(0.85, 0, 0.5, 0)
+	MainFrame.Size = UDim2.new(0, 0, 0, 2)
+	MainFrame.ClipsDescendants = true
+	MainFrame.ZIndex = 500
+	MainFrame.Visible = false
 
-        -- TitleBar
-        local TitleBar = Instance.new("TextButton")
-        TitleBar.Name = NeverLose.RandomString()
-        TitleBar.Parent = MainFrame
-        TitleBar.BackgroundTransparency = 1
-        TitleBar.Size = UDim2.new(1, 0, 0, 30)
-        TitleBar.FontFace = NeverLose.BuiltInBold
-        TitleBar.Text = "  Admin Presence"
-        TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-        TitleBar.TextSize = 13
-        TitleBar.TextXAlignment = Enum.TextXAlignment.Left
-        TitleBar.AutoButtonColor = false
-        TitleBar.ZIndex = 501
+	if not NeverLose.EnabledBlur then
+		MainFrame.BackgroundTransparency = 1
+	end
 
-        local TitleLine = Instance.new("Frame")
-        TitleLine.Name = NeverLose.RandomString()
-        TitleLine.Parent = MainFrame
-        TitleLine.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
-        TitleLine.BackgroundTransparency = 0.5
-        TitleLine.BorderSizePixel = 0
-        TitleLine.Position = UDim2.new(0, 0, 0, 30)
-        TitleLine.Size = UDim2.new(1, 0, 0, 1)
-        TitleLine.ZIndex = 501
+	local MainCorner = Instance.new("UICorner")
+	MainCorner.CornerRadius = UDim.new(0, 10)
+	MainCorner.Parent = MainFrame
 
-        -- Counter (1/3) в правой части заголовка
-        local CounterLabel = Instance.new("TextLabel")
-        CounterLabel.Name = NeverLose.RandomString()
-        CounterLabel.Parent = TitleBar
-        CounterLabel.BackgroundTransparency = 1
-        CounterLabel.BorderSizePixel = 0
-        CounterLabel.Position = UDim2.new(1, -50, 0, 0)
-        CounterLabel.Size = UDim2.new(0, 45, 1, 0)
-        CounterLabel.FontFace = NeverLose.BuiltInBold
-        CounterLabel.Text = "0/0"
-        CounterLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-        CounterLabel.TextSize = 11
-        CounterLabel.TextXAlignment = Enum.TextXAlignment.Right
-        CounterLabel.ZIndex = 502
+	local MainStroke = Instance.new("UIStroke")
+	MainStroke.Color = Color3.fromRGB(45, 48, 58)
+	MainStroke.Transparency = 1
+	MainStroke.Parent = MainFrame
 
-        -- Content area (одна карточка + кнопки навигации)
-        local ContentArea = Instance.new("Frame")
-        ContentArea.Name = NeverLose.RandomString()
-        ContentArea.Parent = MainFrame
-        ContentArea.BackgroundTransparency = 1
-        ContentArea.BorderSizePixel = 0
-        ContentArea.Position = UDim2.new(0, 8, 0, 38)
-        ContentArea.Size = UDim2.new(1, -16, 0, 100)
-        ContentArea.ZIndex = 502
+	local Shadow = NeverLose:CreateShadow(MainFrame)
 
-        -- Left arrow <
-        local PrevBtn = Instance.new("TextButton")
-        PrevBtn.Name = NeverLose.RandomString()
-        PrevBtn.Parent = ContentArea
-        PrevBtn.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
-        PrevBtn.BackgroundTransparency = 0.5
-        PrevBtn.BorderSizePixel = 0
-        PrevBtn.Position = UDim2.new(0, 0, 0.5, -15)
-        PrevBtn.Size = UDim2.new(0, 22, 0, 30)
-        PrevBtn.FontFace = NeverLose.BuiltInBold
-        PrevBtn.Text = "<"
-        PrevBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        PrevBtn.TextSize = 16
-        PrevBtn.AutoButtonColor = false
-        PrevBtn.ZIndex = 503
+	-- Accent line at top (the "полосочка")
+	local AccentTop = Instance.new("Frame")
+	AccentTop.Name = NeverLose.RandomString()
+	AccentTop.Parent = MainFrame
+	AccentTop.BackgroundColor3 = NeverLose.AccentColor
+	AccentTop.BackgroundTransparency = 0
+	AccentTop.BorderSizePixel = 0
+	AccentTop.Position = UDim2.new(0, 0, 0, 0)
+	AccentTop.Size = UDim2.new(1, 0, 0, 2)
+	AccentTop.ZIndex = 510
 
-        local PrevCorner = Instance.new("UICorner")
-        PrevCorner.CornerRadius = UDim.new(0, 4)
-        PrevCorner.Parent = PrevBtn
+	-- Drag handle (top area)
+	local DragHandle = Instance.new("Frame")
+	DragHandle.Name = NeverLose.RandomString()
+	DragHandle.Parent = MainFrame
+	DragHandle.BackgroundTransparency = 1
+	DragHandle.BorderSizePixel = 0
+	DragHandle.Size = UDim2.new(1, 0, 0, 30)
+	DragHandle.ZIndex = 520
 
-        -- Right arrow >
-        local NextBtn = Instance.new("TextButton")
-        NextBtn.Name = NeverLose.RandomString()
-        NextBtn.Parent = ContentArea
-        NextBtn.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
-        NextBtn.BackgroundTransparency = 0.5
-        NextBtn.BorderSizePixel = 0
-        NextBtn.Position = UDim2.new(1, -22, 0.5, -15)
-        NextBtn.Size = UDim2.new(0, 22, 0, 30)
-        NextBtn.FontFace = NeverLose.BuiltInBold
-        NextBtn.Text = ">"
-        NextBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        NextBtn.TextSize = 16
-        NextBtn.AutoButtonColor = false
-        NextBtn.ZIndex = 503
+	NeverLose.Drag(DragHandle, MainFrame, 0.15)
 
-        local NextCorner = Instance.new("UICorner")
-        NextCorner.CornerRadius = UDim.new(0, 4)
-        NextCorner.Parent = NextBtn
+	-- ============================================
+	-- NAVIGATION BAR (arrows + counter) — only when >1 admin
+	-- ============================================
+	local NavBar = Instance.new("Frame")
+	NavBar.Name = NeverLose.RandomString()
+	NavBar.Parent = MainFrame
+	NavBar.BackgroundTransparency = 1
+	NavBar.BorderSizePixel = 0
+	NavBar.Position = UDim2.new(0, 0, 0, 3)
+	NavBar.Size = UDim2.new(1, 0, 0, 24)
+	NavBar.ZIndex = 502
+	NavBar.Visible = false
 
-        -- Card frame (между стрелками)
-        local CardFrame = Instance.new("Frame")
-        CardFrame.Name = NeverLose.RandomString()
-        CardFrame.Parent = ContentArea
-        CardFrame.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
-        CardFrame.BackgroundTransparency = 0.25
-        CardFrame.BorderSizePixel = 0
-        CardFrame.Position = UDim2.new(0, 28, 0, 0)
-        CardFrame.Size = UDim2.new(1, -56, 1, 0)
-        CardFrame.ZIndex = 503
+	local PrevBtn = Instance.new("TextLabel")
+	PrevBtn.Name = NeverLose.RandomString()
+	PrevBtn.Parent = NavBar
+	PrevBtn.AnchorPoint = Vector2.new(0, 0.5)
+	PrevBtn.BackgroundTransparency = 1
+	PrevBtn.BorderSizePixel = 0
+	PrevBtn.Position = UDim2.new(0, 8, 0.5, 0)
+	PrevBtn.Size = UDim2.new(0, 18, 0, 18)
+	PrevBtn.FontFace = NeverLose.BuiltInBold
+	PrevBtn.Text = "chevron-small-left"
+	PrevBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+	PrevBtn.TextSize = 16
+	PrevBtn.TextTransparency = 0.4
+	PrevBtn.ZIndex = 503
 
-        local CardCorner = Instance.new("UICorner")
-        CardCorner.CornerRadius = UDim.new(0, 6)
-        CardCorner.Parent = CardFrame
+	local NextBtn = Instance.new("TextLabel")
+	NextBtn.Name = NeverLose.RandomString()
+	NextBtn.Parent = NavBar
+	NextBtn.AnchorPoint = Vector2.new(1, 0.5)
+	NextBtn.BackgroundTransparency = 1
+	NextBtn.BorderSizePixel = 0
+	NextBtn.Position = UDim2.new(1, -8, 0.5, 0)
+	NextBtn.Size = UDim2.new(0, 18, 0, 18)
+	NextBtn.FontFace = NeverLose.BuiltInBold
+	NextBtn.Text = "chevron-small-right"
+	NextBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+	NextBtn.TextSize = 16
+	NextBtn.TextTransparency = 0.4
+	NextBtn.ZIndex = 503
 
-        local CardStroke = Instance.new("UIStroke")
-        CardStroke.Color = Color3.fromRGB(45, 48, 58)
-        CardStroke.Transparency = 0.5
-        CardStroke.Parent = CardFrame
+	local CounterLabel = Instance.new("TextLabel")
+	CounterLabel.Name = NeverLose.RandomString()
+	CounterLabel.Parent = NavBar
+	CounterLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+	CounterLabel.BackgroundTransparency = 1
+	CounterLabel.BorderSizePixel = 0
+	CounterLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	CounterLabel.Size = UDim2.new(0, 60, 1, 0)
+	CounterLabel.Font = Enum.Font.GothamBold
+	CounterLabel.Text = "1 / 1"
+	CounterLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
+	CounterLabel.TextSize = 11
+	CounterLabel.TextTransparency = 0.3
+	CounterLabel.ZIndex = 503
 
-        -- Avatar (60x60, центр сверху)
-        local Avatar = Instance.new("ImageLabel")
-        Avatar.Name = NeverLose.RandomString()
-        Avatar.Parent = CardFrame
-        Avatar.BackgroundTransparency = 1
-        Avatar.BorderSizePixel = 0
-        Avatar.AnchorPoint = Vector2.new(0.5, 0)
-        Avatar.Position = UDim2.new(0.5, 0, 0, 8)
-        Avatar.Size = UDim2.new(0, 50, 0, 50)
-        Avatar.Image = ""
-        Avatar.ZIndex = 504
+	local NavLine = Instance.new("Frame")
+	NavLine.Name = NeverLose.RandomString()
+	NavLine.Parent = NavBar
+	NavLine.AnchorPoint = Vector2.new(0.5, 1)
+	NavLine.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
+	NavLine.BackgroundTransparency = 0.65
+	NavLine.BorderSizePixel = 0
+	NavLine.Position = UDim2.new(0.5, 0, 1, 2)
+	NavLine.Size = UDim2.new(1, -16, 0, 1)
+	NavLine.ZIndex = 502
 
-        local AvatarCorner = Instance.new("UICorner")
-        AvatarCorner.CornerRadius = UDim.new(0, 6)
-        AvatarCorner.Parent = Avatar
+	-- ============================================
+	-- CONTENT FRAME
+	-- ============================================
+	local ContentFrame = Instance.new("Frame")
+	ContentFrame.Name = NeverLose.RandomString()
+	ContentFrame.Parent = MainFrame
+	ContentFrame.BackgroundTransparency = 1
+	ContentFrame.BorderSizePixel = 0
+	ContentFrame.Position = UDim2.new(0, 0, 0, 5)
+	ContentFrame.Size = UDim2.new(1, 0, 1, -5)
+	ContentFrame.ZIndex = 502
 
-        local AvatarStroke = Instance.new("UIStroke")
-        AvatarStroke.Color = NeverLose.AccentColor
-        AvatarStroke.Transparency = 0.2
-        AvatarStroke.Parent = Avatar
+	-- Avatar
+	local Avatar = Instance.new("ImageLabel")
+	Avatar.Name = NeverLose.RandomString()
+	Avatar.Parent = ContentFrame
+	Avatar.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+	Avatar.BackgroundTransparency = 0
+	Avatar.BorderSizePixel = 0
+	Avatar.Position = UDim2.new(0, 12, 0, 6)
+	Avatar.Size = UDim2.new(0, 48, 0, 48)
+	Avatar.Image = ""
+	Avatar.ZIndex = 504
 
-        -- Name label (DisplayName)
-        local DisplayName = Instance.new("TextLabel")
-        DisplayName.Name = NeverLose.RandomString()
-        DisplayName.Parent = CardFrame
-        DisplayName.BackgroundTransparency = 1
-        DisplayName.BorderSizePixel = 0
-        DisplayName.AnchorPoint = Vector2.new(0.5, 0)
-        DisplayName.Position = UDim2.new(0.5, 0, 0, 62)
-        DisplayName.Size = UDim2.new(1, -10, 0, 16)
-        DisplayName.FontFace = NeverLose.BuiltInBold
-        DisplayName.Text = ""
-        DisplayName.TextColor3 = Color3.fromRGB(255, 255, 255)
-        DisplayName.TextSize = 13
-        DisplayName.TextXAlignment = Enum.TextXAlignment.Center
-        DisplayName.ZIndex = 504
+	local AvatarCorner = Instance.new("UICorner")
+	AvatarCorner.CornerRadius = UDim.new(0, 8)
+	AvatarCorner.Parent = Avatar
 
-        -- UserName (@name)
-        local UserName = Instance.new("TextLabel")
-        UserName.Name = NeverLose.RandomString()
-        UserName.Parent = CardFrame
-        UserName.BackgroundTransparency = 1
-        UserName.BorderSizePixel = 0
-        UserName.AnchorPoint = Vector2.new(0.5, 0)
-        UserName.Position = UDim2.new(0.5, 0, 0, 79)
-        UserName.Size = UDim2.new(1, -10, 0, 13)
-        UserName.FontFace = NeverLose.BuiltInRegular
-        UserName.Text = ""
-        UserName.TextColor3 = Color3.fromRGB(150, 150, 150)
-        UserName.TextSize = 11
-        UserName.TextXAlignment = Enum.TextXAlignment.Center
-        UserName.ZIndex = 504
+	local AvatarStroke = Instance.new("UIStroke")
+	AvatarStroke.Color = NeverLose.AccentColor
+	AvatarStroke.Transparency = 0.35
+	AvatarStroke.Thickness = 1.5
+	AvatarStroke.Parent = Avatar
 
-        -- Joined time
-        local JoinedLabel = Instance.new("TextLabel")
-        JoinedLabel.Name = NeverLose.RandomString()
-        JoinedLabel.Parent = CardFrame
-        JoinedLabel.BackgroundTransparency = 1
-        JoinedLabel.BorderSizePixel = 0
-        JoinedLabel.AnchorPoint = Vector2.new(0.5, 0)
-        JoinedLabel.Position = UDim2.new(0.5, 0, 0, 96)
-        JoinedLabel.Size = UDim2.new(1, -10, 0, 13)
-        JoinedLabel.FontFace = NeverLose.BuiltInRegular
-        JoinedLabel.Text = ""
-        JoinedLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-        JoinedLabel.TextSize = 10
-        JoinedLabel.TextXAlignment = Enum.TextXAlignment.Center
-        JoinedLabel.ZIndex = 504
+	-- Display Name
+	local DispName = Instance.new("TextLabel")
+	DispName.Name = NeverLose.RandomString()
+	DispName.Parent = ContentFrame
+	DispName.BackgroundTransparency = 1
+	DispName.BorderSizePixel = 0
+	DispName.Position = UDim2.new(0, 70, 0, 6)
+	DispName.Size = UDim2.new(1, -82, 0, 17)
+	DispName.Font = Enum.Font.GothamBold
+	DispName.Text = ""
+	DispName.TextColor3 = Color3.fromRGB(255, 255, 255)
+	DispName.TextSize = 14
+	DispName.TextTransparency = 0
+	DispName.TextXAlignment = Enum.TextXAlignment.Left
+	DispName.TextTruncate = Enum.TextTruncate.SplitWord
+	DispName.ZIndex = 504
 
-        -- "No admins" placeholder
-        local EmptyLabel = Instance.new("TextLabel")
-        EmptyLabel.Name = NeverLose.RandomString()
-        EmptyLabel.Parent = CardFrame
-        EmptyLabel.BackgroundTransparency = 1
-        EmptyLabel.BorderSizePixel = 0
-        EmptyLabel.Size = UDim2.new(1, 0, 1, 0)
-        EmptyLabel.FontFace = NeverLose.BuiltInRegular
-        EmptyLabel.Text = "No admins detected"
-        EmptyLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
-        EmptyLabel.TextSize = 12
-        EmptyLabel.TextXAlignment = Enum.TextXAlignment.Center
-        EmptyLabel.TextYAlignment = Enum.TextYAlignment.Center
-        EmptyLabel.Visible = false
-        EmptyLabel.ZIndex = 504
+	-- Username (@name)
+	local UserNameLabel = Instance.new("TextLabel")
+	UserNameLabel.Name = NeverLose.RandomString()
+	UserNameLabel.Parent = ContentFrame
+	UserNameLabel.BackgroundTransparency = 1
+	UserNameLabel.BorderSizePixel = 0
+	UserNameLabel.Position = UDim2.new(0, 70, 0, 24)
+	UserNameLabel.Size = UDim2.new(1, -82, 0, 13)
+	UserNameLabel.Font = Enum.Font.GothamMedium
+	UserNameLabel.Text = ""
+	UserNameLabel.TextColor3 = Color3.fromRGB(130, 130, 130)
+	UserNameLabel.TextSize = 11
+	UserNameLabel.TextTransparency = 0.15
+	UserNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	UserNameLabel.ZIndex = 504
 
-        -- ============================================
-        -- DRAGGING
-        -- ============================================
-        local dragging = false
-        local dragInput, mousePos, framePos
+	-- Role
+	local RoleLabel = Instance.new("TextLabel")
+	RoleLabel.Name = NeverLose.RandomString()
+	RoleLabel.Parent = ContentFrame
+	RoleLabel.BackgroundTransparency = 1
+	RoleLabel.BorderSizePixel = 0
+	RoleLabel.Position = UDim2.new(0, 70, 0, 39)
+	RoleLabel.Size = UDim2.new(1, -82, 0, 13)
+	RoleLabel.Font = Enum.Font.GothamMedium
+	RoleLabel.Text = ""
+	RoleLabel.TextColor3 = NeverLose.AccentColor
+	RoleLabel.TextSize = 11
+	RoleLabel.TextTransparency = 0.15
+	RoleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	RoleLabel.ZIndex = 504
 
-        NeverLose:AddSignal(TitleBar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1
-                or input.UserInputType == Enum.UserInputType.Touch then
-                        dragging = true
-                        mousePos = input.Position
-                        framePos = MainFrame.Position
-                        local con
-                        con = input.Changed:Connect(function()
-                                if input.UserInputState == Enum.UserInputState.End then
-                                        dragging = false
-                                        con:Disconnect()
-                                end
-                        end)
-                end
-        end))
+	-- Separator 1
+	local Sep1 = Instance.new("Frame")
+	Sep1.Name = NeverLose.RandomString()
+	Sep1.Parent = ContentFrame
+	Sep1.AnchorPoint = Vector2.new(0.5, 0)
+	Sep1.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
+	Sep1.BackgroundTransparency = 0.65
+	Sep1.BorderSizePixel = 0
+	Sep1.Position = UDim2.new(0.5, 0, 0, 58)
+	Sep1.Size = UDim2.new(1, -24, 0, 1)
+	Sep1.ZIndex = 503
 
-        NeverLose:AddSignal(UserInputService.InputChanged:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseMovement
-                or input.UserInputType == Enum.UserInputType.Touch then
-                        dragInput = input
-                end
-        end))
+	-- Last Action row
+	local ActionIcon = Instance.new("TextLabel")
+	ActionIcon.Name = NeverLose.RandomString()
+	ActionIcon.Parent = ContentFrame
+	ActionIcon.BackgroundTransparency = 1
+	ActionIcon.BorderSizePixel = 0
+	ActionIcon.Position = UDim2.new(0, 12, 0, 65)
+	ActionIcon.Size = UDim2.new(0, 15, 0, 15)
+	ActionIcon.FontFace = NeverLose.BuiltInBold
+	ActionIcon.Text = "clock"
+	ActionIcon.TextColor3 = Color3.fromRGB(150, 150, 150)
+	ActionIcon.TextSize = 13
+	ActionIcon.TextTransparency = 0.3
+	ActionIcon.ZIndex = 504
 
-        NeverLose:AddSignal(RunService.RenderStepped:Connect(function()
-                if dragging and dragInput then
-                        local delta = dragInput.Position - mousePos
-                        MainFrame.Position = UDim2.new(
-                                framePos.X.Scale, framePos.X.Offset + delta.X,
-                                framePos.Y.Scale, framePos.Y.Offset + delta.Y
-                        )
-                end
-        end))
+	local ActionLabel = Instance.new("TextLabel")
+	ActionLabel.Name = NeverLose.RandomString()
+	ActionLabel.Parent = ContentFrame
+	ActionLabel.BackgroundTransparency = 1
+	ActionLabel.BorderSizePixel = 0
+	ActionLabel.Position = UDim2.new(0, 32, 0, 65)
+	ActionLabel.Size = UDim2.new(1, -44, 0, 15)
+	ActionLabel.Font = Enum.Font.GothamMedium
+	ActionLabel.Text = ""
+	ActionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+	ActionLabel.TextSize = 11
+	ActionLabel.TextTransparency = 0.15
+	ActionLabel.TextXAlignment = Enum.TextXAlignment.Left
+	ActionLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	ActionLabel.ZIndex = 504
 
-        -- ============================================
-        -- COLLAPSE (double-click title)
-        -- ============================================
-        local isCollapsed = false
-        local lastClick = 0
-        NeverLose:AddSignal(TitleBar.MouseButton1Click:Connect(function()
-                if tick() - lastClick < 0.3 then
-                        isCollapsed = not isCollapsed
-                        if isCollapsed then
-                                MainFrame.Size = UDim2.new(0, 280, 0, 30)
-                                ContentArea.Visible = false
-                                TitleLine.Visible = false
-                        else
-                                ContentArea.Visible = true
-                                TitleLine.Visible = true
-                                MainFrame.Size = UDim2.new(0, 280, 0, 146)
-                        end
-                end
-                lastClick = tick()
-        end))
+	-- Separator 2
+	local Sep2 = Instance.new("Frame")
+	Sep2.Name = NeverLose.RandomString()
+	Sep2.Parent = ContentFrame
+	Sep2.AnchorPoint = Vector2.new(0.5, 0)
+	Sep2.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
+	Sep2.BackgroundTransparency = 0.65
+	Sep2.BorderSizePixel = 0
+	Sep2.Position = UDim2.new(0.5, 0, 0, 86)
+	Sep2.Size = UDim2.new(1, -24, 0, 1)
+	Sep2.ZIndex = 503
 
-        -- ============================================
-        -- STATE
-        -- ============================================
-        local admins = {}            -- [player] = { time = "HH:MM:SS", rank = 0, roleName = "..." }
-        local adminList = {}         -- упорядоченный список player'ов
-        local currentIndex = 1
+	-- ============================================
+	-- ACTION BUTTONS (Spectate, Teleport)
+	-- ============================================
+	local BtnFrame = Instance.new("Frame")
+	BtnFrame.Name = NeverLose.RandomString()
+	BtnFrame.Parent = ContentFrame
+	BtnFrame.BackgroundTransparency = 1
+	BtnFrame.BorderSizePixel = 0
+	BtnFrame.Position = UDim2.new(0, 10, 0, 93)
+	BtnFrame.Size = UDim2.new(1, -20, 0, 28)
+	BtnFrame.ZIndex = 504
 
-        local function renderCurrent()
-                if not adminList then return end
-                local count = #adminList
-                CounterLabel.Text = count > 0 and (currentIndex .. "/" .. count) or "0/0"
+	local BtnLayout = Instance.new("UIListLayout")
+	BtnLayout.Parent = BtnFrame
+	BtnLayout.FillDirection = Enum.FillDirection.Horizontal
+	BtnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	BtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	BtnLayout.Padding = UDim.new(0, 6)
+	BtnLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-                if count == 0 then
-                        Avatar.Visible = false
-                        DisplayName.Visible = false
-                        UserName.Visible = false
-                        JoinedLabel.Visible = false
-                        EmptyLabel.Visible = true
-                        PrevBtn.Visible = false
-                        NextBtn.Visible = false
-                        if not isCollapsed then
-                                MainFrame.Size = UDim2.new(0, 280, 0, 80)
-                        end
-                        return
-                end
+	local function createActionBtn(parent, iconStr, label, order)
+		local btn = Instance.new("Frame")
+		btn.Name = NeverLose.RandomString()
+		btn.Parent = parent
+		btn.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+		btn.BackgroundTransparency = 0.25
+		btn.BorderSizePixel = 0
+		btn.Size = UDim2.new(0.5, -3, 0, 26)
+		btn.ZIndex = 505
+		btn.LayoutOrder = order
 
-                if currentIndex > count then currentIndex = count end
-                if currentIndex < 1 then currentIndex = 1 end
+		local cr = Instance.new("UICorner")
+		cr.CornerRadius = UDim.new(0, 5)
+		cr.Parent = btn
 
-                local player = adminList[currentIndex]
-                local data = admins[player]
-                if not player or not data then return end
+		local st = Instance.new("UIStroke")
+		st.Color = Color3.fromRGB(45, 48, 58)
+		st.Transparency = 0.55
+		st.Parent = btn
 
-                Avatar.Visible = true
-                DisplayName.Visible = true
-                UserName.Visible = true
-                JoinedLabel.Visible = true
-                EmptyLabel.Visible = false
-                PrevBtn.Visible = count > 1
-                NextBtn.Visible = count > 1
+		local ico = Instance.new("TextLabel")
+		ico.Name = NeverLose.RandomString()
+		ico.Parent = btn
+		ico.AnchorPoint = Vector2.new(0, 0.5)
+		ico.BackgroundTransparency = 1
+		ico.BorderSizePixel = 0
+		ico.Position = UDim2.new(0, 7, 0.5, 0)
+		ico.Size = UDim2.new(0, 14, 0, 14)
+		ico.FontFace = NeverLose.BuiltInBold
+		ico.Text = iconStr
+		ico.TextColor3 = Color3.fromRGB(190, 190, 190)
+		ico.TextSize = 13
+		ico.TextTransparency = 0.25
+		ico.ZIndex = 506
 
-                Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
-                DisplayName.Text = player.DisplayName
-                UserName.Text = "@" .. player.Name
-                JoinedLabel.Text = "Joined: " .. data.time .. "  •  " .. (data.roleName or "Admin")
+		local lbl = Instance.new("TextLabel")
+		lbl.Name = NeverLose.RandomString()
+		lbl.Parent = btn
+		lbl.AnchorPoint = Vector2.new(0, 0.5)
+		lbl.BackgroundTransparency = 1
+		lbl.BorderSizePixel = 0
+		lbl.Position = UDim2.new(0, 24, 0.5, 0)
+		lbl.Size = UDim2.new(1, -30, 0, 14)
+		lbl.Font = Enum.Font.GothamMedium
+		lbl.Text = label
+		lbl.TextColor3 = Color3.fromRGB(190, 190, 190)
+		lbl.TextSize = 11
+		lbl.TextTransparency = 0.15
+		lbl.TextXAlignment = Enum.TextXAlignment.Left
+		lbl.ZIndex = 506
 
-                CounterLabel.Text = currentIndex .. "/" .. count
+		local inp = NeverLose:CreateInput(btn)
 
-                if not isCollapsed then
-                        MainFrame.Size = UDim2.new(0, 280, 0, 146)
-                end
-        end
+		NeverLose:AddSignal(inp.MouseEnter:Connect(function()
+			NeverLose.PlayAnimate(btn, SlowyTween, { BackgroundTransparency = 0.05 })
+			NeverLose.PlayAnimate(st, SlowyTween, { Transparency = 0.3 })
+			NeverLose.PlayAnimate(ico, SlowyTween, { TextTransparency = 0.05 })
+			NeverLose.PlayAnimate(lbl, SlowyTween, { TextTransparency = 0.0 })
+		end))
 
-        NeverLose:AddSignal(PrevBtn.MouseButton1Click:Connect(function()
-                if not adminList then return end
-                local count = #adminList
-                if count <= 1 then return end
-                currentIndex = currentIndex - 1
-                if currentIndex < 1 then currentIndex = count end
-                renderCurrent()
-        end))
+		NeverLose:AddSignal(inp.MouseLeave:Connect(function()
+			NeverLose.PlayAnimate(btn, SlowyTween, { BackgroundTransparency = 0.25 })
+			NeverLose.PlayAnimate(st, SlowyTween, { Transparency = 0.55 })
+			NeverLose.PlayAnimate(ico, SlowyTween, { TextTransparency = 0.25 })
+			NeverLose.PlayAnimate(lbl, SlowyTween, { TextTransparency = 0.15 })
+		end))
 
-        NeverLose:AddSignal(NextBtn.MouseButton1Click:Connect(function()
-                if not adminList then return end
-                local count = #adminList
-                if count <= 1 then return end
-                currentIndex = currentIndex + 1
-                if currentIndex > count then currentIndex = 1 end
-                renderCurrent()
-        end))
+		return btn, inp, ico, lbl
+	end
 
-        -- Hover-эффекты на стрелках
-        NeverLose:AddSignal(PrevBtn.MouseEnter:Connect(function()
-                NeverLose.PlayAnimate(PrevBtn, SlowyTween, { BackgroundTransparency = 0.2 })
-        end))
-        NeverLose:AddSignal(PrevBtn.MouseLeave:Connect(function()
-                NeverLose.PlayAnimate(PrevBtn, SlowyTween, { BackgroundTransparency = 0.5 })
-        end))
-        NeverLose:AddSignal(NextBtn.MouseEnter:Connect(function()
-                NeverLose.PlayAnimate(NextBtn, SlowyTween, { BackgroundTransparency = 0.2 })
-        end))
-        NeverLose:AddSignal(NextBtn.MouseLeave:Connect(function()
-                NeverLose.PlayAnimate(NextBtn, SlowyTween, { BackgroundTransparency = 0.5 })
-        end))
+	local SpectateBtn, SpectateInp, SpectateIco, SpectateLbl = createActionBtn(BtnFrame, "eye", "Spectate", 1)
+	local TeleportBtn, TeleportInp, TeleportIco, TeleportLbl = createActionBtn(BtnFrame, "location-pin", "Teleport", 2)
 
-        -- ============================================
-        -- ЛОГИКА ОБНАРУЖЕНИЯ (без task.spawn — без race condition)
-        -- ============================================
-        local function rebuildList()
-                if not adminList then return end
-                table.clear(adminList)
-                for player, _ in pairs(admins) do
-                        table.insert(adminList, player)
-                end
-                table.sort(adminList, function(a, b)
-                        return a.Name:lower() < b.Name:lower()
-                end)
-                if #adminList == 0 then
-                        MainFrame.Visible = false
-                else
-                        MainFrame.Visible = true
-                        if currentIndex > #adminList then currentIndex = 1 end
-                end
-                renderCurrent()
-        end
+	-- ============================================
+	-- TELEPORT CONFIRMATION DIALOG
+	-- ============================================
+	local ConfirmFrame = Instance.new("Frame")
+	ConfirmFrame.Name = NeverLose.RandomString()
+	ConfirmFrame.Parent = NeverLose.ScreenGui
+	ConfirmFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	ConfirmFrame.BackgroundColor3 = Color3.fromRGB(12, 14, 19)
+	ConfirmFrame.BackgroundTransparency = 1
+	ConfirmFrame.BorderSizePixel = 0
+	ConfirmFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	ConfirmFrame.Size = UDim2.new(0, 250, 0, 105)
+	ConfirmFrame.ClipsDescendants = true
+	ConfirmFrame.ZIndex = 600
+	ConfirmFrame.Visible = false
 
-        local function checkAdmin(player, isJoin)
-                if player == LocalPlayer then return end
-                if not admins then return end
+	local ConfCorner = Instance.new("UICorner")
+	ConfCorner.CornerRadius = UDim.new(0, 10)
+	ConfCorner.Parent = ConfirmFrame
 
-                local success, rank = pcall(function()
-                        return player:GetRankInGroup(groupId)
-                end)
+	local ConfStroke = Instance.new("UIStroke")
+	ConfStroke.Color = Color3.fromRGB(45, 48, 58)
+	ConfStroke.Transparency = 1
+	ConfStroke.Parent = ConfirmFrame
 
-                local minRank = type(rankId) == "number" and rankId or 255
-                local actualRank = type(rank) == "number" and rank or 0
-                if success and actualRank >= minRank then
-                        local displayRank = type(rankName) == "table"
-                                and (rankName[actualRank] or "Admin")
-                                or (rankName or "Admin")
-                        admins[player] = {
-                                time = os.date("%H:%M:%S"),
-                                rank = actualRank,
-                                roleName = displayRank,
-                        }
-                        rebuildList()
+	local ConfShadow = NeverLose:CreateShadow(ConfirmFrame)
 
-                        Notifier.new({
-                                Title = string.format("(%s) %s", player.DisplayName, player.Name),
-                                Content = isJoin
-                                        and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
-                                        or ("In Server (" .. displayRank .. ")"),
-                                Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
-                                Duration = 10
-                        })
-                end
-        end
+	-- Accent top on confirm
+	local ConfAccent = Instance.new("Frame")
+	ConfAccent.Parent = ConfirmFrame
+	ConfAccent.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+	ConfAccent.BackgroundTransparency = 0.2
+	ConfAccent.BorderSizePixel = 0
+	ConfAccent.Position = UDim2.new(0, 0, 0, 0)
+	ConfAccent.Size = UDim2.new(1, 0, 0, 2)
+	ConfAccent.ZIndex = 601
 
-        -- Первоначальное сканирование (синхронно, без spawn)
-        for _, player in ipairs(Players:GetPlayers()) do
-                pcall(checkAdmin, player, false)
-        end
+	local ConfTitle = Instance.new("TextLabel")
+	ConfTitle.Name = NeverLose.RandomString()
+	ConfTitle.Parent = ConfirmFrame
+	ConfTitle.BackgroundTransparency = 1
+	ConfTitle.BorderSizePixel = 0
+	ConfTitle.Position = UDim2.new(0, 14, 0, 10)
+	ConfTitle.Size = UDim2.new(1, -28, 0, 16)
+	ConfTitle.Font = Enum.Font.GothamBold
+	ConfTitle.Text = "Teleport Confirmation"
+	ConfTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	ConfTitle.TextSize = 13
+	ConfTitle.TextTransparency = 0
+	ConfTitle.TextXAlignment = Enum.TextXAlignment.Left
+	ConfTitle.ZIndex = 602
 
-        NeverLose:AddSignal(Players.PlayerAdded:Connect(function(player)
-                task.wait(0.3)
-                pcall(checkAdmin, player, true)
-        end))
+	local ConfDesc = Instance.new("TextLabel")
+	ConfDesc.Name = NeverLose.RandomString()
+	ConfDesc.Parent = ConfirmFrame
+	ConfDesc.BackgroundTransparency = 1
+	ConfDesc.BorderSizePixel = 0
+	ConfDesc.Position = UDim2.new(0, 14, 0, 30)
+	ConfDesc.Size = UDim2.new(1, -28, 0, 14)
+	ConfDesc.Font = Enum.Font.GothamMedium
+	ConfDesc.Text = ""
+	ConfDesc.TextColor3 = Color3.fromRGB(150, 150, 150)
+	ConfDesc.TextSize = 11
+	ConfDesc.TextTransparency = 0.15
+	ConfDesc.TextXAlignment = Enum.TextXAlignment.Left
+	ConfDesc.ZIndex = 602
 
-        NeverLose:AddSignal(Players.PlayerRemoving:Connect(function(player)
-                if admins and admins[player] then
-                        admins[player] = nil
-                        rebuildList()
+	-- Confirm buttons row
+	local ConfBtnRow = Instance.new("Frame")
+	ConfBtnRow.Parent = ConfirmFrame
+	ConfBtnRow.BackgroundTransparency = 1
+	ConfBtnRow.BorderSizePixel = 0
+	ConfBtnRow.Position = UDim2.new(0, 12, 0, 56)
+	ConfBtnRow.Size = UDim2.new(1, -24, 0, 34)
+	ConfBtnRow.ZIndex = 602
 
-                        Notifier.new({
-                                Title = string.format("(%s) %s", player.DisplayName, player.Name),
-                                Content = "Left at " .. os.date("%H:%M:%S"),
-                                Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
-                                Duration = 7
-                        })
-                end
-        end))
+	local ConfBtnLayout = Instance.new("UIListLayout")
+	ConfBtnLayout.Parent = ConfBtnRow
+	ConfBtnLayout.FillDirection = Enum.FillDirection.Horizontal
+	ConfBtnLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	ConfBtnLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	ConfBtnLayout.Padding = UDim.new(0, 8)
+
+	-- Confirm YES
+	local YesBtn = Instance.new("Frame")
+	YesBtn.Name = NeverLose.RandomString()
+	YesBtn.Parent = ConfBtnRow
+	YesBtn.BackgroundColor3 = NeverLose.AccentColor
+	YesBtn.BackgroundTransparency = 0.25
+	YesBtn.BorderSizePixel = 0
+	YesBtn.Size = UDim2.new(0.5, -4, 0, 28)
+	YesBtn.ZIndex = 603
+
+	Instance.new("UICorner", YesBtn).CornerRadius = UDim.new(0, 6)
+
+	local YesLbl = Instance.new("TextLabel")
+	YesLbl.Parent = YesBtn
+	YesLbl.AnchorPoint = Vector2.new(0.5, 0.5)
+	YesLbl.BackgroundTransparency = 1
+	YesLbl.Position = UDim2.new(0.5, 0, 0.5, 0)
+	YesLbl.Size = UDim2.new(1, 0, 1, 0)
+	YesLbl.Font = Enum.Font.GothamBold
+	YesLbl.Text = "Confirm"
+	YesLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+	YesLbl.TextSize = 12
+	YesLbl.ZIndex = 604
+
+	-- Confirm NO
+	local NoBtn = Instance.new("Frame")
+	NoBtn.Name = NeverLose.RandomString()
+	NoBtn.Parent = ConfBtnRow
+	NoBtn.BackgroundColor3 = Color3.fromRGB(28, 30, 38)
+	NoBtn.BackgroundTransparency = 0.15
+	NoBtn.BorderSizePixel = 0
+	NoBtn.Size = UDim2.new(0.5, -4, 0, 28)
+	NoBtn.ZIndex = 603
+
+	Instance.new("UICorner", NoBtn).CornerRadius = UDim.new(0, 6)
+
+	local NoStroke = Instance.new("UIStroke")
+	NoStroke.Color = Color3.fromRGB(45, 48, 58)
+	NoStroke.Transparency = 0.5
+	NoStroke.Parent = NoBtn
+
+	local NoLbl = Instance.new("TextLabel")
+	NoLbl.Parent = NoBtn
+	NoLbl.AnchorPoint = Vector2.new(0.5, 0.5)
+	NoLbl.BackgroundTransparency = 1
+	NoLbl.Position = UDim2.new(0.5, 0, 0.5, 0)
+	NoLbl.Size = UDim2.new(1, 0, 1, 0)
+	NoLbl.Font = Enum.Font.GothamBold
+	NoLbl.Text = "Cancel"
+	NoLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
+	NoLbl.TextSize = 12
+	NoLbl.ZIndex = 604
+
+	-- Confirm state
+	local confirmTarget = nil
+	local confirmOpen = false
+
+	local function showConfirm(player)
+		confirmTarget = player
+		ConfDesc.Text = "Teleport to " .. player.DisplayName .. "?"
+		ConfirmFrame.Visible = true
+		confirmOpen = true
+
+		NeverLose.PlayAnimate(ConfirmFrame, VSlowTween, { BackgroundTransparency = 0.04 })
+		NeverLose.PlayAnimate(ConfStroke, SlowyTween, { Transparency = 0.5 })
+		ConfShadow:Render(true)
+	end
+
+	local function hideConfirm()
+		confirmOpen = false
+		confirmTarget = nil
+
+		NeverLose.PlayAnimate(ConfirmFrame, SlowyTween, { BackgroundTransparency = 1 })
+		NeverLose.PlayAnimate(ConfStroke, SlowyTween, { Transparency = 1 })
+		ConfShadow:Render(false)
+
+		task.delay(0.2, function()
+			if not confirmOpen then
+				ConfirmFrame.Visible = false
+			end
+		end)
+	end
+
+	-- YES click
+	NeverLose:CreateInput(YesBtn, function()
+		if confirmTarget and confirmTarget.Character and confirmTarget.Character:FindFirstChild("HumanoidRootPart") then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				LocalPlayer.Character.HumanoidRootPart.CFrame = confirmTarget.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 4)
+				Logging.new("location-pin", "Teleported to " .. confirmTarget.DisplayName, 3)
+			end
+		end
+		hideConfirm()
+	end)
+
+	-- NO click
+	NeverLose:CreateInput(NoBtn, function()
+		hideConfirm()
+	end)
+
+	-- Close confirm on outside click
+	NeverLose:AddSignal(UserInputService.InputBegan:Connect(function(input)
+		if not confirmOpen then return end
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			if not NeverLose:IsMouseOverFrame(ConfirmFrame) then
+				hideConfirm()
+			end
+		end
+	end))
+
+	-- ============================================
+	-- EXPAND / COLLAPSE — "тоненькая полосочка"
+	-- AnchorPoint 0.5,0.5 — all 4 sides simultaneously
+	-- ============================================
+	local function showWidget()
+		if widgetVisible then return end
+		widgetVisible = true
+		MainFrame.Visible = true
+
+		-- Start as invisible thin accent line
+		MainFrame.Size = UDim2.new(0, 0, 0, 2)
+		MainFrame.BackgroundTransparency = 0.5
+
+		-- Phase 1: accent line shoots out horizontally
+		NeverLose.PlayAnimate(MainFrame, ExpandTween, {
+			Size = UDim2.new(0, CARD_W, 0, 2),
+			BackgroundTransparency = (NeverLose.EnabledBlur and 0.055) or 0.025
+		})
+
+		-- Phase 2: expand vertically (starts slightly overlapping phase 1)
+		task.delay(0.12, function()
+			if not widgetVisible then return end
+
+			NeverLose.PlayAnimate(MainFrame, ExpandTweenSlow, {
+				Size = UDim2.new(0, CARD_W, 0, getCardHeight())
+			})
+
+			NeverLose.PlayAnimate(MainStroke, SlowyTween, { Transparency = 0.5 })
+			Shadow:Render(true)
+		end)
+	end
+
+	local function hideWidget()
+		if not widgetVisible then return end
+		widgetVisible = false
+
+		Shadow:Render(false)
+
+		-- Phase 1: collapse vertically
+		NeverLose.PlayAnimate(MainFrame, ExpandTween, {
+			Size = UDim2.new(0, CARD_W, 0, 2)
+		})
+
+		NeverLose.PlayAnimate(MainStroke, SlowyTween, { Transparency = 1 })
+
+		-- Phase 2: collapse horizontally
+		task.delay(0.12, function()
+			if widgetVisible then return end
+
+			NeverLose.PlayAnimate(MainFrame, ExpandTween, {
+				Size = UDim2.new(0, 0, 0, 2),
+				BackgroundTransparency = 1
+			})
+
+			task.delay(0.25, function()
+				if not widgetVisible then
+					MainFrame.Visible = false
+				end
+			end)
+		end)
+	end
+
+	-- ============================================
+	-- RENDER CURRENT CARD
+	-- ============================================
+	local function renderCurrent()
+		local count = #adminList
+
+		if count == 0 then
+			hideWidget()
+			return
+		end
+
+		if currentIndex > count then currentIndex = count end
+		if currentIndex < 1 then currentIndex = 1 end
+
+		local player = adminList[currentIndex]
+		local data = admins[player]
+		if not player or not data then return end
+
+		-- Nav bar
+		local hasNav = count > 1
+		NavBar.Visible = hasNav
+		CounterLabel.Text = currentIndex .. " / " .. count
+
+		-- Shift content down when nav visible
+		if hasNav then
+			ContentFrame.Position = UDim2.new(0, 0, 0, 30)
+			ContentFrame.Size = UDim2.new(1, 0, 1, -30)
+		else
+			ContentFrame.Position = UDim2.new(0, 0, 0, 5)
+			ContentFrame.Size = UDim2.new(1, 0, 1, -5)
+		end
+
+		-- Fill data
+		Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
+		DispName.Text = player.DisplayName
+		UserNameLabel.Text = "@" .. player.Name
+		RoleLabel.Text = data.roleName or "Admin"
+
+		-- Action icons
+		local actionIcons = {
+			joined = "door-open-arrow-to-bottom-right",
+			left = "arrow-right-from-portrait-rectangle",
+			chatted = "speech-bubble-round",
+			team_change = "two-arrows-switch-right",
+		}
+
+		ActionIcon.Text = actionIcons[data.lastAction] or "clock"
+		ActionLabel.Text = (data.lastActionText or "Joined") .. "  " .. (data.lastActionTime or data.time)
+
+		-- Spectate label state
+		if isSpectating and adminList[currentIndex] == player then
+			SpectateIco.Text = "eye-slash"
+			SpectateLbl.Text = "Stop"
+		else
+			SpectateIco.Text = "eye"
+			SpectateLbl.Text = "Spectate"
+		end
+
+		-- Resize if already visible
+		if widgetVisible then
+			NeverLose.PlayAnimate(MainFrame, VSlowTween, {
+				Size = UDim2.new(0, CARD_W, 0, getCardHeight())
+			})
+		end
+
+		-- Show if not visible
+		if not widgetVisible then
+			showWidget()
+		end
+	end
+
+	-- ============================================
+	-- NAV CLICKS
+	-- ============================================
+	local prevInp = NeverLose:CreateInput(PrevBtn, function()
+		if #adminList <= 1 then return end
+		currentIndex = currentIndex - 1
+		if currentIndex < 1 then currentIndex = #adminList end
+		renderCurrent()
+	end)
+
+	local nextInp = NeverLose:CreateInput(NextBtn, function()
+		if #adminList <= 1 then return end
+		currentIndex = currentIndex + 1
+		if currentIndex > #adminList then currentIndex = 1 end
+		renderCurrent()
+	end)
+
+	NeverLose:AddSignal(prevInp.MouseEnter:Connect(function()
+		NeverLose.PlayAnimate(PrevBtn, SlowyTween, { TextTransparency = 0.1 })
+	end))
+	NeverLose:AddSignal(prevInp.MouseLeave:Connect(function()
+		NeverLose.PlayAnimate(PrevBtn, SlowyTween, { TextTransparency = 0.4 })
+	end))
+	NeverLose:AddSignal(nextInp.MouseEnter:Connect(function()
+		NeverLose.PlayAnimate(NextBtn, SlowyTween, { TextTransparency = 0.1 })
+	end))
+	NeverLose:AddSignal(nextInp.MouseLeave:Connect(function()
+		NeverLose.PlayAnimate(NextBtn, SlowyTween, { TextTransparency = 0.4 })
+	end))
+
+	-- ============================================
+	-- SPECTATE HANDLER (toggle)
+	-- ============================================
+	NeverLose:AddSignal(SpectateInp.MouseButton1Click:Connect(function()
+		if #adminList == 0 then return end
+		local player = adminList[currentIndex]
+		if not player then return end
+
+		if isSpectating then
+			local lp_humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+			if lp_humanoid then
+				CurrentCamera.CameraSubject = lp_humanoid
+			end
+			isSpectating = false
+			SpectateIco.Text = "eye"
+			SpectateLbl.Text = "Spectate"
+			Logging.new("eye", "Stopped spectating", 2)
+		else
+			if player.Character then
+				local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+				if humanoid then
+					CurrentCamera.CameraSubject = humanoid
+					isSpectating = true
+					SpectateIco.Text = "eye-slash"
+					SpectateLbl.Text = "Stop"
+					Logging.new("eye", "Spectating " .. player.DisplayName, 2)
+				end
+			end
+		end
+	end))
+
+	-- ============================================
+	-- TELEPORT HANDLER (shows confirmation)
+	-- ============================================
+	NeverLose:AddSignal(TeleportInp.MouseButton1Click:Connect(function()
+		if #adminList == 0 then return end
+		local player = adminList[currentIndex]
+		if player then
+			showConfirm(player)
+		end
+	end))
+
+	-- ============================================
+	-- ACTION TRACKING (chat, team change)
+	-- ============================================
+	local function updateAction(player, actionType, actionText)
+		if not admins[player] then return end
+
+		admins[player].lastAction = actionType
+		admins[player].lastActionText = actionText
+		admins[player].lastActionTime = os.date("%H:%M:%S")
+
+		if adminList[currentIndex] == player then
+			renderCurrent()
+		end
+	end
+
+	local function connectTracking(player)
+		if not admins[player] then return end
+
+		local chatSig = player.Chatted:Connect(function(msg)
+			local preview = #msg > 28 and (msg:sub(1, 28) .. "..") or msg
+			updateAction(player, "chatted", '"' .. preview .. '"')
+		end)
+		admins[player]._chatSig = chatSig
+		NeverLose:AddSignal(chatSig)
+
+		local teamSig = player:GetPropertyChangedSignal("Team"):Connect(function()
+			local teamName = player.Team and player.Team.Name or "None"
+			updateAction(player, "team_change", "Team -> " .. teamName)
+		end)
+		admins[player]._teamSig = teamSig
+		NeverLose:AddSignal(teamSig)
+	end
+
+	local function disconnectTracking(player)
+		if not admins[player] then return end
+
+		if admins[player]._chatSig then
+			pcall(function() admins[player]._chatSig:Disconnect() end)
+		end
+		if admins[player]._teamSig then
+			pcall(function() admins[player]._teamSig:Disconnect() end)
+		end
+	end
+
+	-- ============================================
+	-- DETECTION LOGIC
+	-- ============================================
+	local function rebuildList()
+		table.clear(adminList)
+		for player, _ in pairs(admins) do
+			table.insert(adminList, player)
+		end
+		table.sort(adminList, function(a, b)
+			return a.Name:lower() < b.Name:lower()
+		end)
+
+		if #adminList == 0 then
+			hideWidget()
+		else
+			if currentIndex > #adminList then currentIndex = 1 end
+			renderCurrent()
+		end
+	end
+
+	local function checkAdmin(player, isJoin)
+		if player == LocalPlayer then return end
+
+		local success, rank = pcall(function()
+			return player:GetRankInGroup(groupId)
+		end)
+
+		local minRank = type(rankId) == "number" and rankId or 255
+		local actualRank = type(rank) == "number" and rank or 0
+
+		if success and actualRank >= minRank then
+			local displayRank = type(rankName) == "table"
+				and (rankName[actualRank] or "Admin")
+				or (rankName or "Admin")
+
+			admins[player] = {
+				time = os.date("%H:%M:%S"),
+				rank = actualRank,
+				roleName = displayRank,
+				lastAction = "joined",
+				lastActionText = isJoin and "Joined" or "In Server",
+				lastActionTime = os.date("%H:%M:%S"),
+			}
+
+			connectTracking(player)
+			rebuildList()
+
+			Notifier.new({
+				Title = string.format("(%s) %s", player.DisplayName, player.Name),
+				Content = isJoin
+					and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
+					or ("In Server (" .. displayRank .. ")"),
+				Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+				Duration = 10
+			})
+		end
+	end
+
+	-- Initial scan
+	for _, player in ipairs(Players:GetPlayers()) do
+		pcall(checkAdmin, player, false)
+	end
+
+	-- Player joined
+	NeverLose:AddSignal(Players.PlayerAdded:Connect(function(player)
+		task.wait(0.3)
+		pcall(checkAdmin, player, true)
+	end))
+
+	-- Player leaving — show "Left" briefly, then remove
+	NeverLose:AddSignal(Players.PlayerRemoving:Connect(function(player)
+		if admins[player] then
+			disconnectTracking(player)
+
+			-- Update card to show "Left" action
+			updateAction(player, "left", "Left the server")
+
+			Notifier.new({
+				Title = string.format("(%s) %s", player.DisplayName, player.Name),
+				Content = "Left at " .. os.date("%H:%M:%S"),
+				Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+				Duration = 7
+			})
+
+			-- Keep card with "Left" status for 3 seconds, then remove
+			task.delay(3, function()
+				if admins[player] then
+					admins[player] = nil
+					rebuildList()
+				end
+			end)
+		end
+	end))
 end
 
 function NeverLose:Unload()
