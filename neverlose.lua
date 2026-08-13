@@ -6737,29 +6737,6 @@ function NeverLose:AdminPresence(groupId, ranks)
 
 	local Shadow = NeverLose:CreateShadow(MainFrame)
 
-	-- Accent line at top (the "полосочка")
-	local AccentTop = Instance.new("Frame")
-	AccentTop.Name = NeverLose.RandomString()
-	AccentTop.Parent = MainFrame
-	AccentTop.BackgroundColor3 = NeverLose.AccentColor
-	AccentTop.BackgroundTransparency = 0
-	AccentTop.BorderSizePixel = 0
-	AccentTop.AnchorPoint = Vector2.new(0.5, 0)
-	AccentTop.Position = UDim2.new(0.5, 0, 0, 0)
-	AccentTop.Size = UDim2.new(1, -20, 0, 2)
-	AccentTop.ZIndex = 510
-
-	local AccentGradient = Instance.new("UIGradient")
-	AccentGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.3, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.5, NeverLose.AccentColor),
-		ColorSequenceKeypoint.new(0.7, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
-	})
-	AccentGradient.Offset = Vector2.new(-1, 0)
-	AccentGradient.Parent = AccentTop
-
 
 	-- Drag handle (top area)
 	local DragHandle = Instance.new("Frame")
@@ -7099,28 +7076,6 @@ function NeverLose:AdminPresence(groupId, ranks)
 
 	local ConfShadow = NeverLose:CreateShadow(ConfirmFrame)
 
-	-- Accent top on confirm
-	local ConfAccent = Instance.new("Frame")
-	ConfAccent.Parent = ConfirmFrame
-	ConfAccent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	ConfAccent.BackgroundTransparency = 0.2
-	ConfAccent.BorderSizePixel = 0
-	ConfAccent.AnchorPoint = Vector2.new(0.5, 0)
-	ConfAccent.Position = UDim2.new(0.5, 0, 0, 0)
-	ConfAccent.Size = UDim2.new(1, -20, 0, 2)
-	ConfAccent.ZIndex = 601
-
-	local ConfGradient = Instance.new("UIGradient")
-	ConfGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.3, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 100, 100)),
-		ColorSequenceKeypoint.new(0.7, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
-	})
-	ConfGradient.Offset = Vector2.new(-1, 0)
-	ConfGradient.Parent = ConfAccent
-
 
 	local ConfTitle = Instance.new("TextLabel")
 	ConfTitle.Name = NeverLose.RandomString()
@@ -7339,31 +7294,6 @@ function NeverLose:AdminPresence(groupId, ranks)
 		end)
 	end
 
-	-- ============================================
-	-- GLARE ANIMATION LOOP
-	-- ============================================
-	task.spawn(function()
-		while true do
-			task.wait(0.02)
-			if MainFrame.Parent == nil then break end
-			
-			if widgetVisible then
-				AccentGradient.Offset = AccentGradient.Offset + Vector2.new(0.015, 0)
-				if AccentGradient.Offset.X > 1 then
-					AccentGradient.Offset = Vector2.new(-1, 0)
-					task.wait(2) -- Pause between sweeps
-				end
-			end
-
-			if confirmOpen then
-				ConfGradient.Offset = ConfGradient.Offset + Vector2.new(0.015, 0)
-				if ConfGradient.Offset.X > 1 then
-					ConfGradient.Offset = Vector2.new(-1, 0)
-					task.wait(1.5)
-				end
-			end
-		end
-	end)
 
 	-- ============================================
 	-- RENDER CURRENT CARD
