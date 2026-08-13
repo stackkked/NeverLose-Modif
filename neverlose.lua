@@ -6971,6 +6971,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         local currentIndex = 1
 
         local function renderCurrent()
+                if not adminList then return end
                 local count = #adminList
                 CounterLabel.Text = count > 0 and (currentIndex .. "/" .. count) or "0/0"
 
@@ -6982,7 +6983,9 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
                         EmptyLabel.Visible = true
                         PrevBtn.Visible = false
                         NextBtn.Visible = false
-                        MainFrame.Size = UDim2.new(0, 280, 0, 80)
+                        if not isCollapsed then
+                                MainFrame.Size = UDim2.new(0, 280, 0, 80)
+                        end
                         return
                 end
 
@@ -7004,7 +7007,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
                 Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
                 DisplayName.Text = player.DisplayName
                 UserName.Text = "@" .. player.Name
-                JoinedLabel.Text = "Joined: " .. data.time .. "  •  " .. data.roleName
+                JoinedLabel.Text = "Joined: " .. data.time .. "  •  " .. (data.roleName or "Admin")
 
                 CounterLabel.Text = currentIndex .. "/" .. count
 
@@ -7014,6 +7017,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         end
 
         NeverLose:AddSignal(PrevBtn.MouseButton1Click:Connect(function()
+                if not adminList then return end
                 local count = #adminList
                 if count <= 1 then return end
                 currentIndex = currentIndex - 1
@@ -7022,6 +7026,7 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         end))
 
         NeverLose:AddSignal(NextBtn.MouseButton1Click:Connect(function()
+                if not adminList then return end
                 local count = #adminList
                 if count <= 1 then return end
                 currentIndex = currentIndex + 1
@@ -7044,9 +7049,10 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         end))
 
         -- ============================================
-        -- ЛОГИКА ОБНАРУЖЕНИЯ
+        -- ЛОГИКА ОБНАРУЖЕНИЯ (без task.spawn — без race condition)
         -- ============================================
         local function rebuildList()
+                if not adminList then return end
                 table.clear(adminList)
                 for player, _ in pairs(admins) do
                         table.insert(adminList, player)
@@ -7065,47 +7071,48 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 
         local function checkAdmin(player, isJoin)
                 if player == LocalPlayer then return end
-                task.spawn(function()
-                        local success, rank = pcall(function()
-                                return player:GetRankInGroup(groupId)
-                        end)
+                if not admins then return end
 
-                        local minRank = type(rankId) == "number" and rankId or 255
-                        local actualRank = type(rank) == "number" and rank or 0
-                        if success and actualRank >= minRank then
-                                local displayRank = type(rankName) == "table"
-                                        and (rankName[actualRank] or "Admin")
-                                        or (rankName or "Admin")
-                                admins[player] = {
-                                        time = os.date("%H:%M:%S"),
-                                        rank = actualRank,
-                                        roleName = displayRank,
-                                }
-                                rebuildList()
-
-                                Notifier.new({
-                                        Title = string.format("(%s) %s", player.DisplayName, player.Name),
-                                        Content = isJoin
-                                                and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
-                                                or ("In Server (" .. displayRank .. ")"),
-                                        Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
-                                        Duration = 10
-                                })
-                        end
+                local success, rank = pcall(function()
+                        return player:GetRankInGroup(groupId)
                 end)
+
+                local minRank = type(rankId) == "number" and rankId or 255
+                local actualRank = type(rank) == "number" and rank or 0
+                if success and actualRank >= minRank then
+                        local displayRank = type(rankName) == "table"
+                                and (rankName[actualRank] or "Admin")
+                                or (rankName or "Admin")
+                        admins[player] = {
+                                time = os.date("%H:%M:%S"),
+                                rank = actualRank,
+                                roleName = displayRank,
+                        }
+                        rebuildList()
+
+                        Notifier.new({
+                                Title = string.format("(%s) %s", player.DisplayName, player.Name),
+                                Content = isJoin
+                                        and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
+                                        or ("In Server (" .. displayRank .. ")"),
+                                Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+                                Duration = 10
+                        })
+                end
         end
 
+        -- Первоначальное сканирование (синхронно, без spawn)
         for _, player in ipairs(Players:GetPlayers()) do
-                checkAdmin(player, false)
+                pcall(checkAdmin, player, false)
         end
 
         NeverLose:AddSignal(Players.PlayerAdded:Connect(function(player)
                 task.wait(0.3)
-                checkAdmin(player, true)
+                pcall(checkAdmin, player, true)
         end))
 
         NeverLose:AddSignal(Players.PlayerRemoving:Connect(function(player)
-                if admins[player] then
+                if admins and admins[player] then
                         admins[player] = nil
                         rebuildList()
 
