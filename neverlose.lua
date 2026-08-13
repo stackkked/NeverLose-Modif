@@ -6728,6 +6728,8 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         local UIListLayout = Instance.new("UIListLayout")
         UIListLayout.Parent = ContentFrame
         UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        UIListLayout.FillDirection = Enum.FillDirection.Vertical
+        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
         UIListLayout.Padding = UDim.new(0, 5)
 
         local dragging = false
