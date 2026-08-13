@@ -6682,65 +6682,239 @@ end;
 
 function NeverLose:AdminPresence(groupId, rankId, rankName)
         local Notifier = NeverLose:CreateNotification()
-        
+
+        -- ============================================
+        -- COMPACT ADMIN PRESENCE WIDGET
+        -- ============================================
+        -- Одна карточка с переключением через < >
+        -- Стиль совпадает с главным меню NeverLose
+
         local MainFrame = Instance.new("Frame")
         MainFrame.Name = NeverLose.RandomString()
         MainFrame.Parent = NeverLose.ScreenGui
         MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
-        MainFrame.Position = UDim2.new(0, 50, 0.5, 0)
-        MainFrame.Size = UDim2.new(0, 250, 0, 30)
+        MainFrame.BackgroundTransparency = 0.05
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Position = UDim2.new(0, 50, 0.5, -90)
+        MainFrame.Size = UDim2.new(0, 280, 0, 30)
         MainFrame.Visible = false
-        MainFrame.Active = false
         MainFrame.ZIndex = 500
 
-        local UICorner = Instance.new("UICorner")
-        UICorner.CornerRadius = UDim.new(0, 5)
-        UICorner.Parent = MainFrame
+        local MainCorner = Instance.new("UICorner")
+        MainCorner.CornerRadius = UDim.new(0, 6)
+        MainCorner.Parent = MainFrame
 
-        local UIStroke = Instance.new("UIStroke")
-        UIStroke.Color = Color3.fromRGB(45, 48, 58)
-        UIStroke.Transparency = 0.65
-        UIStroke.Parent = MainFrame
+        local MainStroke = Instance.new("UIStroke")
+        MainStroke.Color = Color3.fromRGB(45, 48, 58)
+        MainStroke.Transparency = 0.35
+        MainStroke.Parent = MainFrame
 
+        -- TitleBar
         local TitleBar = Instance.new("TextButton")
         TitleBar.Name = NeverLose.RandomString()
         TitleBar.Parent = MainFrame
-        TitleBar.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
         TitleBar.BackgroundTransparency = 1
         TitleBar.Size = UDim2.new(1, 0, 0, 30)
         TitleBar.FontFace = NeverLose.BuiltInBold
-        TitleBar.Text = "  Admin Presence (Double Click)"
+        TitleBar.Text = "  Admin Presence"
         TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-        TitleBar.TextSize = 12
+        TitleBar.TextSize = 13
         TitleBar.TextXAlignment = Enum.TextXAlignment.Left
+        TitleBar.AutoButtonColor = false
         TitleBar.ZIndex = 501
 
-        local ContentFrame = Instance.new("Frame")
-        ContentFrame.Name = NeverLose.RandomString()
-        ContentFrame.Parent = MainFrame
-        ContentFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
-        ContentFrame.BackgroundTransparency = 1
-        ContentFrame.Position = UDim2.new(0, 0, 0, 30)
-        ContentFrame.Size = UDim2.new(1, 0, 1, -30)
-        ContentFrame.ClipsDescendants = true
-        ContentFrame.ZIndex = 502
+        local TitleLine = Instance.new("Frame")
+        TitleLine.Name = NeverLose.RandomString()
+        TitleLine.Parent = MainFrame
+        TitleLine.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
+        TitleLine.BackgroundTransparency = 0.5
+        TitleLine.BorderSizePixel = 0
+        TitleLine.Position = UDim2.new(0, 0, 0, 30)
+        TitleLine.Size = UDim2.new(1, 0, 0, 1)
+        TitleLine.ZIndex = 501
 
-        local UIListLayout = Instance.new("UIListLayout")
-        UIListLayout.Parent = ContentFrame
-        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        UIListLayout.FillDirection = Enum.FillDirection.Vertical
-        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        UIListLayout.Padding = UDim.new(0, 5)
+        -- Counter (1/3) в правой части заголовка
+        local CounterLabel = Instance.new("TextLabel")
+        CounterLabel.Name = NeverLose.RandomString()
+        CounterLabel.Parent = TitleBar
+        CounterLabel.BackgroundTransparency = 1
+        CounterLabel.BorderSizePixel = 0
+        CounterLabel.Position = UDim2.new(1, -50, 0, 0)
+        CounterLabel.Size = UDim2.new(0, 45, 1, 0)
+        CounterLabel.FontFace = NeverLose.BuiltInBold
+        CounterLabel.Text = "0/0"
+        CounterLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        CounterLabel.TextSize = 11
+        CounterLabel.TextXAlignment = Enum.TextXAlignment.Right
+        CounterLabel.ZIndex = 502
 
+        -- Content area (одна карточка + кнопки навигации)
+        local ContentArea = Instance.new("Frame")
+        ContentArea.Name = NeverLose.RandomString()
+        ContentArea.Parent = MainFrame
+        ContentArea.BackgroundTransparency = 1
+        ContentArea.BorderSizePixel = 0
+        ContentArea.Position = UDim2.new(0, 8, 0, 38)
+        ContentArea.Size = UDim2.new(1, -16, 0, 100)
+        ContentArea.ZIndex = 502
+
+        -- Left arrow <
+        local PrevBtn = Instance.new("TextButton")
+        PrevBtn.Name = NeverLose.RandomString()
+        PrevBtn.Parent = ContentArea
+        PrevBtn.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+        PrevBtn.BackgroundTransparency = 0.5
+        PrevBtn.BorderSizePixel = 0
+        PrevBtn.Position = UDim2.new(0, 0, 0.5, -15)
+        PrevBtn.Size = UDim2.new(0, 22, 0, 30)
+        PrevBtn.FontFace = NeverLose.BuiltInBold
+        PrevBtn.Text = "<"
+        PrevBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        PrevBtn.TextSize = 16
+        PrevBtn.AutoButtonColor = false
+        PrevBtn.ZIndex = 503
+
+        local PrevCorner = Instance.new("UICorner")
+        PrevCorner.CornerRadius = UDim.new(0, 4)
+        PrevCorner.Parent = PrevBtn
+
+        -- Right arrow >
+        local NextBtn = Instance.new("TextButton")
+        NextBtn.Name = NeverLose.RandomString()
+        NextBtn.Parent = ContentArea
+        NextBtn.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+        NextBtn.BackgroundTransparency = 0.5
+        NextBtn.BorderSizePixel = 0
+        NextBtn.Position = UDim2.new(1, -22, 0.5, -15)
+        NextBtn.Size = UDim2.new(0, 22, 0, 30)
+        NextBtn.FontFace = NeverLose.BuiltInBold
+        NextBtn.Text = ">"
+        NextBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        NextBtn.TextSize = 16
+        NextBtn.AutoButtonColor = false
+        NextBtn.ZIndex = 503
+
+        local NextCorner = Instance.new("UICorner")
+        NextCorner.CornerRadius = UDim.new(0, 4)
+        NextCorner.Parent = NextBtn
+
+        -- Card frame (между стрелками)
+        local CardFrame = Instance.new("Frame")
+        CardFrame.Name = NeverLose.RandomString()
+        CardFrame.Parent = ContentArea
+        CardFrame.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
+        CardFrame.BackgroundTransparency = 0.25
+        CardFrame.BorderSizePixel = 0
+        CardFrame.Position = UDim2.new(0, 28, 0, 0)
+        CardFrame.Size = UDim2.new(1, -56, 1, 0)
+        CardFrame.ZIndex = 503
+
+        local CardCorner = Instance.new("UICorner")
+        CardCorner.CornerRadius = UDim.new(0, 6)
+        CardCorner.Parent = CardFrame
+
+        local CardStroke = Instance.new("UIStroke")
+        CardStroke.Color = Color3.fromRGB(45, 48, 58)
+        CardStroke.Transparency = 0.5
+        CardStroke.Parent = CardFrame
+
+        -- Avatar (60x60, центр сверху)
+        local Avatar = Instance.new("ImageLabel")
+        Avatar.Name = NeverLose.RandomString()
+        Avatar.Parent = CardFrame
+        Avatar.BackgroundTransparency = 1
+        Avatar.BorderSizePixel = 0
+        Avatar.AnchorPoint = Vector2.new(0.5, 0)
+        Avatar.Position = UDim2.new(0.5, 0, 0, 8)
+        Avatar.Size = UDim2.new(0, 50, 0, 50)
+        Avatar.Image = ""
+        Avatar.ZIndex = 504
+
+        local AvatarCorner = Instance.new("UICorner")
+        AvatarCorner.CornerRadius = UDim.new(0, 6)
+        AvatarCorner.Parent = Avatar
+
+        local AvatarStroke = Instance.new("UIStroke")
+        AvatarStroke.Color = NeverLose.AccentColor
+        AvatarStroke.Transparency = 0.2
+        AvatarStroke.Parent = Avatar
+
+        -- Name label (DisplayName)
+        local DisplayName = Instance.new("TextLabel")
+        DisplayName.Name = NeverLose.RandomString()
+        DisplayName.Parent = CardFrame
+        DisplayName.BackgroundTransparency = 1
+        DisplayName.BorderSizePixel = 0
+        DisplayName.AnchorPoint = Vector2.new(0.5, 0)
+        DisplayName.Position = UDim2.new(0.5, 0, 0, 62)
+        DisplayName.Size = UDim2.new(1, -10, 0, 16)
+        DisplayName.FontFace = NeverLose.BuiltInBold
+        DisplayName.Text = ""
+        DisplayName.TextColor3 = Color3.fromRGB(255, 255, 255)
+        DisplayName.TextSize = 13
+        DisplayName.TextXAlignment = Enum.TextXAlignment.Center
+        DisplayName.ZIndex = 504
+
+        -- UserName (@name)
+        local UserName = Instance.new("TextLabel")
+        UserName.Name = NeverLose.RandomString()
+        UserName.Parent = CardFrame
+        UserName.BackgroundTransparency = 1
+        UserName.BorderSizePixel = 0
+        UserName.AnchorPoint = Vector2.new(0.5, 0)
+        UserName.Position = UDim2.new(0.5, 0, 0, 79)
+        UserName.Size = UDim2.new(1, -10, 0, 13)
+        UserName.FontFace = NeverLose.BuiltInRegular
+        UserName.Text = ""
+        UserName.TextColor3 = Color3.fromRGB(150, 150, 150)
+        UserName.TextSize = 11
+        UserName.TextXAlignment = Enum.TextXAlignment.Center
+        UserName.ZIndex = 504
+
+        -- Joined time
+        local JoinedLabel = Instance.new("TextLabel")
+        JoinedLabel.Name = NeverLose.RandomString()
+        JoinedLabel.Parent = CardFrame
+        JoinedLabel.BackgroundTransparency = 1
+        JoinedLabel.BorderSizePixel = 0
+        JoinedLabel.AnchorPoint = Vector2.new(0.5, 0)
+        JoinedLabel.Position = UDim2.new(0.5, 0, 0, 96)
+        JoinedLabel.Size = UDim2.new(1, -10, 0, 13)
+        JoinedLabel.FontFace = NeverLose.BuiltInRegular
+        JoinedLabel.Text = ""
+        JoinedLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+        JoinedLabel.TextSize = 10
+        JoinedLabel.TextXAlignment = Enum.TextXAlignment.Center
+        JoinedLabel.ZIndex = 504
+
+        -- "No admins" placeholder
+        local EmptyLabel = Instance.new("TextLabel")
+        EmptyLabel.Name = NeverLose.RandomString()
+        EmptyLabel.Parent = CardFrame
+        EmptyLabel.BackgroundTransparency = 1
+        EmptyLabel.BorderSizePixel = 0
+        EmptyLabel.Size = UDim2.new(1, 0, 1, 0)
+        EmptyLabel.FontFace = NeverLose.BuiltInRegular
+        EmptyLabel.Text = "No admins detected"
+        EmptyLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+        EmptyLabel.TextSize = 12
+        EmptyLabel.TextXAlignment = Enum.TextXAlignment.Center
+        EmptyLabel.TextYAlignment = Enum.TextYAlignment.Center
+        EmptyLabel.Visible = false
+        EmptyLabel.ZIndex = 504
+
+        -- ============================================
+        -- DRAGGING
+        -- ============================================
         local dragging = false
         local dragInput, mousePos, framePos
 
         NeverLose:AddSignal(TitleBar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                if input.UserInputType == Enum.UserInputType.MouseButton1
+                or input.UserInputType == Enum.UserInputType.Touch then
                         dragging = true
                         mousePos = input.Position
                         framePos = MainFrame.Position
-                        
                         local con
                         con = input.Changed:Connect(function()
                                 if input.UserInputState == Enum.UserInputState.End then
@@ -6752,7 +6926,8 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         end))
 
         NeverLose:AddSignal(UserInputService.InputChanged:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseMovement then
+                if input.UserInputType == Enum.UserInputType.MouseMovement
+                or input.UserInputType == Enum.UserInputType.Touch then
                         dragInput = input
                 end
         end))
@@ -6760,101 +6935,132 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         NeverLose:AddSignal(RunService.RenderStepped:Connect(function()
                 if dragging and dragInput then
                         local delta = dragInput.Position - mousePos
-                        MainFrame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+                        MainFrame.Position = UDim2.new(
+                                framePos.X.Scale, framePos.X.Offset + delta.X,
+                                framePos.Y.Scale, framePos.Y.Offset + delta.Y
+                        )
                 end
         end))
 
+        -- ============================================
+        -- COLLAPSE (double-click title)
+        -- ============================================
         local isCollapsed = false
         local lastClick = 0
         NeverLose:AddSignal(TitleBar.MouseButton1Click:Connect(function()
                 if tick() - lastClick < 0.3 then
                         isCollapsed = not isCollapsed
                         if isCollapsed then
-                                MainFrame.Size = UDim2.new(0, 250, 0, 30)
-                                ContentFrame.Visible = false
+                                MainFrame.Size = UDim2.new(0, 280, 0, 30)
+                                ContentArea.Visible = false
+                                TitleLine.Visible = false
                         else
-                                ContentFrame.Visible = true
-                                if #activeCards > 0 then
-                                        MainFrame.Size = UDim2.new(0, 250, 0, 35 + (#activeCards * 45))
-                                end
+                                ContentArea.Visible = true
+                                TitleLine.Visible = true
+                                MainFrame.Size = UDim2.new(0, 280, 0, 146)
                         end
                 end
                 lastClick = tick()
         end))
 
-        local admins = {}
-        local activeCards = {}
+        -- ============================================
+        -- STATE
+        -- ============================================
+        local admins = {}            -- [player] = { time = "HH:MM:SS", rank = 0, roleName = "..." }
+        local adminList = {}         -- упорядоченный список player'ов
+        local currentIndex = 1
 
-        local function updateAdminUI()
-                for _, card in pairs(activeCards) do
-                        card:Destroy()
+        local function renderCurrent()
+                local count = #adminList
+                CounterLabel.Text = count > 0 and (currentIndex .. "/" .. count) or "0/0"
+
+                if count == 0 then
+                        Avatar.Visible = false
+                        DisplayName.Visible = false
+                        UserName.Visible = false
+                        JoinedLabel.Visible = false
+                        EmptyLabel.Visible = true
+                        PrevBtn.Visible = false
+                        NextBtn.Visible = false
+                        MainFrame.Size = UDim2.new(0, 280, 0, 80)
+                        return
                 end
-                table.clear(activeCards)
-                
-                local count = 0
-                for player, data in pairs(admins) do
-                        count = count + 1
-                        
-                        local Card = Instance.new("Frame")
-                        Card.Name = NeverLose.RandomString()
-                        Card.Parent = ContentFrame
-                        Card.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
-                        Card.BackgroundTransparency = 0.5
-                        Card.Size = UDim2.new(1, -10, 0, 40)
-                        Card.Position = UDim2.new(0, 5, 0, 0)
-                        Card.ZIndex = 510
-                        
-                        local CardCorner = Instance.new("UICorner")
-                        CardCorner.CornerRadius = UDim.new(0, 5)
-                        CardCorner.Parent = Card
-                        
-                        local Avatar = Instance.new("ImageLabel")
-                        Avatar.Parent = Card
-                        Avatar.BackgroundTransparency = 1
-                        Avatar.Position = UDim2.new(0, 5, 0, 5)
-                        Avatar.Size = UDim2.new(0, 30, 0, 30)
-                        Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
-                        Avatar.ZIndex = 511
-                        
-                        local AvatarCorner = Instance.new("UICorner")
-                        AvatarCorner.CornerRadius = UDim.new(0, 5)
-                        AvatarCorner.Parent = Avatar
-                        
-                        local NameLabel = Instance.new("TextLabel")
-                        NameLabel.Parent = Card
-                        NameLabel.BackgroundTransparency = 1
-                        NameLabel.Position = UDim2.new(0, 45, 0, 5)
-                        NameLabel.Size = UDim2.new(1, -50, 0, 15)
-                        NameLabel.FontFace = NeverLose.BuiltInBold
-                        NameLabel.Text = string.format("(%s) %s", player.DisplayName, player.Name)
-                        NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        NameLabel.TextSize = 12
-                        NameLabel.TextXAlignment = Enum.TextXAlignment.Left
-                        NameLabel.ZIndex = 511
-                        
-                        local TimeLabel = Instance.new("TextLabel")
-                        TimeLabel.Parent = Card
-                        TimeLabel.BackgroundTransparency = 1
-                        TimeLabel.Position = UDim2.new(0, 45, 0, 20)
-                        TimeLabel.Size = UDim2.new(1, -50, 0, 15)
-                        TimeLabel.FontFace = NeverLose.BuiltInRegular
-                        TimeLabel.Text = "Joined: " .. data.time
-                        TimeLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-                        TimeLabel.TextSize = 11
-                        TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
-                        TimeLabel.ZIndex = 511
-                        
-                        table.insert(activeCards, Card)
+
+                if currentIndex > count then currentIndex = count end
+                if currentIndex < 1 then currentIndex = 1 end
+
+                local player = adminList[currentIndex]
+                local data = admins[player]
+                if not player or not data then return end
+
+                Avatar.Visible = true
+                DisplayName.Visible = true
+                UserName.Visible = true
+                JoinedLabel.Visible = true
+                EmptyLabel.Visible = false
+                PrevBtn.Visible = count > 1
+                NextBtn.Visible = count > 1
+
+                Avatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150"
+                DisplayName.Text = player.DisplayName
+                UserName.Text = "@" .. player.Name
+                JoinedLabel.Text = "Joined: " .. data.time .. "  •  " .. data.roleName
+
+                CounterLabel.Text = currentIndex .. "/" .. count
+
+                if not isCollapsed then
+                        MainFrame.Size = UDim2.new(0, 280, 0, 146)
                 end
-                
-                if count > 0 then
-                        MainFrame.Visible = true
-                        if not isCollapsed then
-                                MainFrame.Size = UDim2.new(0, 250, 0, 35 + (count * 45))
-                        end
-                else
+        end
+
+        NeverLose:AddSignal(PrevBtn.MouseButton1Click:Connect(function()
+                local count = #adminList
+                if count <= 1 then return end
+                currentIndex = currentIndex - 1
+                if currentIndex < 1 then currentIndex = count end
+                renderCurrent()
+        end))
+
+        NeverLose:AddSignal(NextBtn.MouseButton1Click:Connect(function()
+                local count = #adminList
+                if count <= 1 then return end
+                currentIndex = currentIndex + 1
+                if currentIndex > count then currentIndex = 1 end
+                renderCurrent()
+        end))
+
+        -- Hover-эффекты на стрелках
+        NeverLose:AddSignal(PrevBtn.MouseEnter:Connect(function()
+                NeverLose.PlayAnimate(PrevBtn, SlowyTween, { BackgroundTransparency = 0.2 })
+        end))
+        NeverLose:AddSignal(PrevBtn.MouseLeave:Connect(function()
+                NeverLose.PlayAnimate(PrevBtn, SlowyTween, { BackgroundTransparency = 0.5 })
+        end))
+        NeverLose:AddSignal(NextBtn.MouseEnter:Connect(function()
+                NeverLose.PlayAnimate(NextBtn, SlowyTween, { BackgroundTransparency = 0.2 })
+        end))
+        NeverLose:AddSignal(NextBtn.MouseLeave:Connect(function()
+                NeverLose.PlayAnimate(NextBtn, SlowyTween, { BackgroundTransparency = 0.5 })
+        end))
+
+        -- ============================================
+        -- ЛОГИКА ОБНАРУЖЕНИЯ
+        -- ============================================
+        local function rebuildList()
+                table.clear(adminList)
+                for player, _ in pairs(admins) do
+                        table.insert(adminList, player)
+                end
+                table.sort(adminList, function(a, b)
+                        return a.Name:lower() < b.Name:lower()
+                end)
+                if #adminList == 0 then
                         MainFrame.Visible = false
+                else
+                        MainFrame.Visible = true
+                        if currentIndex > #adminList then currentIndex = 1 end
                 end
+                renderCurrent()
         end
 
         local function checkAdmin(player, isJoin)
@@ -6863,17 +7069,25 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
                         local success, rank = pcall(function()
                                 return player:GetRankInGroup(groupId)
                         end)
-                        
+
                         local minRank = type(rankId) == "number" and rankId or 255
                         local actualRank = type(rank) == "number" and rank or 0
                         if success and actualRank >= minRank then
-                                local displayRank = type(rankName) == "table" and (rankName[actualRank] or "Admin") or rankName
-                                admins[player] = {time = os.date("%H:%M:%S")}
-                                updateAdminUI()
-                                
+                                local displayRank = type(rankName) == "table"
+                                        and (rankName[actualRank] or "Admin")
+                                        or (rankName or "Admin")
+                                admins[player] = {
+                                        time = os.date("%H:%M:%S"),
+                                        rank = actualRank,
+                                        roleName = displayRank,
+                                }
+                                rebuildList()
+
                                 Notifier.new({
                                         Title = string.format("(%s) %s", player.DisplayName, player.Name),
-                                        Content = isJoin and ("Joined at " .. admins[player].time) or ("In Server (" .. displayRank .. ")"),
+                                        Content = isJoin
+                                                and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
+                                                or ("In Server (" .. displayRank .. ")"),
                                         Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
                                         Duration = 10
                                 })
@@ -6886,14 +7100,15 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
         end
 
         NeverLose:AddSignal(Players.PlayerAdded:Connect(function(player)
+                task.wait(0.3)
                 checkAdmin(player, true)
         end))
 
         NeverLose:AddSignal(Players.PlayerRemoving:Connect(function(player)
                 if admins[player] then
                         admins[player] = nil
-                        updateAdminUI()
-                        
+                        rebuildList()
+
                         Notifier.new({
                                 Title = string.format("(%s) %s", player.DisplayName, player.Name),
                                 Content = "Left at " .. os.date("%H:%M:%S"),
