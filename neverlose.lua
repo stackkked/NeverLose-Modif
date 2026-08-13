@@ -4,7 +4,7 @@
         License: MIT
     Discord: https://arceney.win/discord
     Other-Projects: https://4lpaca.win
-        FORK BY: shakedows
+        FORK BY: stackkked
 ]]
 
 do
@@ -6680,7 +6680,7 @@ function NeverLose:CreateIndicator()
         return Indicators;
 end;
 
-function NeverLose:AdminPresence(groupId, rankId, rankName)
+function NeverLose:AdminPresence(groupId, ranks)
 	local Notifier = NeverLose:CreateNotification()
 	local Logging = NeverLose:CreateLogger()
 
@@ -6744,8 +6744,9 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 	AccentTop.BackgroundColor3 = NeverLose.AccentColor
 	AccentTop.BackgroundTransparency = 0
 	AccentTop.BorderSizePixel = 0
-	AccentTop.Position = UDim2.new(0, 0, 0, 0)
-	AccentTop.Size = UDim2.new(1, 0, 0, 2)
+	AccentTop.AnchorPoint = Vector2.new(0.5, 0)
+	AccentTop.Position = UDim2.new(0.5, 0, 0, 0)
+	AccentTop.Size = UDim2.new(1, -20, 0, 2)
 	AccentTop.ZIndex = 510
 
 	-- Drag handle (top area)
@@ -7527,13 +7528,10 @@ function NeverLose:AdminPresence(groupId, rankId, rankName)
 			return player:GetRankInGroup(groupId)
 		end)
 
-		local minRank = type(rankId) == "number" and rankId or 255
 		local actualRank = type(rank) == "number" and rank or 0
 
-		if success and actualRank >= minRank then
-			local displayRank = type(rankName) == "table"
-				and (rankName[actualRank] or "Admin")
-				or (rankName or "Admin")
+		if success and ranks[actualRank] then
+			local displayRank = ranks[actualRank]
 
 			admins[player] = {
 				time = os.date("%H:%M:%S"),
