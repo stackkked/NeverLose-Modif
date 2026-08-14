@@ -6363,9 +6363,9 @@ function NeverLose:CreateWindow(Config)
                         function Bind:SetState(s)
                                 StateLbl.Text = "[" .. s .. "]"
                                 if s == "on" or s == "holding" or s == "active" or s == "toggled" then
-                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 0.5 })
-                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 0.5 })
-                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 0.5 })
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
                                 else
                                         NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(120, 120, 120), TextStrokeTransparency = 1 })
                                         NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeTransparency = 1 })
