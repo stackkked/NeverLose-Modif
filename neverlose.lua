@@ -6020,7 +6020,25 @@ function NeverLose:CreateWindow(Config)
                 Shadow:Render(true);
 
                 Watermark_lb.Renders = {};
+                Watermark_lb.Blocks = {};
                 Watermark_lb.Status = true;
+
+                function Watermark_lb:UpdateSeparators()
+                        local firstVisible = nil
+                        for _, b in ipairs(Watermark_lb.Blocks) do
+                                if b.Visible then
+                                        firstVisible = b
+                                        break
+                                end
+                        end
+                        for _, b in ipairs(Watermark_lb.Blocks) do
+                                local needsSep = b.Visible and (b ~= firstVisible)
+                                if b.NeedsSeparator ~= needsSep then
+                                        b.NeedsSeparator = needsSep
+                                        b.Update()
+                                end
+                        end
+                end
 
                 function Watermark_lb:SetRender(value)
                         Watermark_lb.Status = value;
