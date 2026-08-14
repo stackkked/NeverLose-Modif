@@ -5987,8 +5987,14 @@ function NeverLose:CreateWindow(Config)
 			ColorSequenceKeypoint.new(1, NeverLose.AccentColor)
 		})
 		TopLineGradient.Parent = TopLine
+		
+		local InnerContainer = Instance.new("Frame")
+		InnerContainer.Name = NeverLose.RandomString()
+		InnerContainer.Parent = Watermark
+		InnerContainer.BackgroundTransparency = 1
+		InnerContainer.Size = UDim2.new(1, 0, 1, 0)
 
-		UIListLayout.Parent = Watermark
+		UIListLayout.Parent = InnerContainer
 		UIListLayout.FillDirection = Enum.FillDirection.Horizontal
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -5996,8 +6002,10 @@ function NeverLose:CreateWindow(Config)
 
                 empty_space.Size = UDim2.fromOffset(5,0);
                 empty_space.BackgroundTransparency = 1;
-                empty_space.Parent = Watermark;
+                empty_space.Parent = InnerContainer;
                 empty_space.LayoutOrder = 5;
+
+                Watermark_lb.InnerContainer = InnerContainer;
 
                 Watermark:GetPropertyChangedSignal('BackgroundTransparency'):Connect(LPH_NO_VIRTUALIZE(function()
                         if Watermark.BackgroundTransparency > 0.9 then
@@ -6098,7 +6106,7 @@ function NeverLose:CreateWindow(Config)
                         local Icon = Instance.new("TextLabel")
                         local Separator = Instance.new("TextLabel")
 
-                        Frame.Parent = Watermark
+                        Frame.Parent = Watermark_lb.InnerContainer
                         Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         Frame.BackgroundTransparency = 1.000
                         Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
