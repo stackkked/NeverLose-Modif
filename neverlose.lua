@@ -6406,28 +6406,33 @@ function NeverLose:CreateNotification(positionStr)
             Notification.AnchorPoint = Vector2.new(0, 0)
             Notification.Position = UDim2.new(0, 25, 0, 25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
             slideStartX, slideEndX = -750, 0
             notifyAnchor = Vector2.new(0, 0)
         elseif positionStr == "TopCenter" then
             Notification.AnchorPoint = Vector2.new(0.5, 0)
             Notification.Position = UDim2.new(0.5, 0, 0, 25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
             slideStartX, slideEndX = 0, 0.5
             notifyAnchor = Vector2.new(0.5, 0)
         elseif positionStr == "BottomLeft" then
             Notification.AnchorPoint = Vector2.new(0, 1)
             Notification.Position = UDim2.new(0, 25, 1, -25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
             slideStartX, slideEndX = -750, 0
             notifyAnchor = Vector2.new(0, 0)
         elseif positionStr == "BottomRight" then
             Notification.AnchorPoint = Vector2.new(1, 1)
             Notification.Position = UDim2.new(1, -25, 1, -25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
         else -- TopRight (default)
             Notification.AnchorPoint = Vector2.new(1, 0)
             Notification.Position = UDim2.new(1, -25, 0, 25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
         end
 
         Notification.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
