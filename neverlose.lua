@@ -6451,11 +6451,22 @@ function NeverLose:CreateNotification(positionStr)
 
         function Notifier.new(Config)
                 Config = NeverLose:ProcessParams(Config , {
-                        Title = "Notification",
+                        Type = "info",
                         Content = "Hello World!",
                         Logo = NeverLose.GlobalLogo or "rbxasset://textures/ui/VerifiedBadgeNameIcon.png",
+                        IconColor = nil,
                         Duration = 5,
                 });
+
+                local presets = {
+                        success = Color3.fromRGB(85, 255, 85),
+                        error = Color3.fromRGB(255, 85, 85),
+                        warning = Color3.fromRGB(255, 170, 0),
+                        info = Color3.fromRGB(85, 170, 255)
+                }
+                
+                local presetColor = presets[string.lower(Config.Type)] or presets.info
+                local finalColor = Config.IconColor or presetColor
 
                 if NeverLose.__WatermarkCache then
                         NeverLose.PlayAnimate(Notification,SlowyTween , {
@@ -6469,7 +6480,6 @@ function NeverLose:CreateNotification(positionStr)
                 local UIStroke = Instance.new("UIStroke")
                 local LogoImage = Instance.new("ImageLabel")
                 local UICorner_2 = Instance.new("UICorner")
-                local NotifyName = Instance.new("TextLabel")
                 local NotifyContent = Instance.new("TextLabel");
                 local shadow = NeverLose:CreateShadow(NotifyFrame , true);
 
@@ -6490,7 +6500,7 @@ function NeverLose:CreateNotification(positionStr)
                 NotifyFrame.BorderSizePixel = 0
                 NotifyFrame.ClipsDescendants = true
                 NotifyFrame.Position = UDim2.new(0, slideStartX, 0, 0)
-                NotifyFrame.Size = UDim2.new(0, 220, 0, 55)
+                NotifyFrame.Size = UDim2.new(0, 220, 0, 32)
                 NotifyFrame.ZIndex = 130
 
                 UICorner.CornerRadius = UDim.new(0, 10)
@@ -6508,51 +6518,36 @@ function NeverLose:CreateNotification(positionStr)
                 LogoImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 LogoImage.BorderSizePixel = 0
                 LogoImage.Position = UDim2.new(0, 10, 0.5, 0)
-                LogoImage.Size = UDim2.new(0, 35, 0, 35)
+                LogoImage.Size = UDim2.new(0, 20, 0, 20)
                 LogoImage.ZIndex = 131
                 LogoImage.Image = Config.Logo
-                LogoImage.ImageColor3 = NeverLose.IconColor;
+                LogoImage.ImageColor3 = finalColor;
 
-                UICorner_2.CornerRadius = UDim.new(0, 7)
+                UICorner_2.CornerRadius = UDim.new(0, 5)
                 UICorner_2.Parent = LogoImage
-
-                NotifyName.Name = NeverLose.RandomString();
-                NotifyName.Parent = NotifyFrame
-                NotifyName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                NotifyName.BackgroundTransparency = 1.000
-                NotifyName.BorderColor3 = Color3.fromRGB(0, 0, 0)
-                NotifyName.BorderSizePixel = 0
-                NotifyName.Position = UDim2.new(0, 50, 0, 7)
-                NotifyName.Size = UDim2.new(0, 200, 0, 20)
-                NotifyName.ZIndex = 132
-                NotifyName.Font = NeverLose.MainFontBold
-                NotifyName.Text = Config.Title
-                NotifyName.TextColor3 = Color3.fromRGB(255, 255, 255)
-                NotifyName.TextSize = 17.000
-                NotifyName.TextXAlignment = Enum.TextXAlignment.Left
 
                 NotifyContent.Name = NeverLose.RandomString();
                 NotifyContent.Parent = NotifyFrame
+                NotifyContent.AnchorPoint = Vector2.new(0, 0.5)
                 NotifyContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 NotifyContent.BackgroundTransparency = 1.000
                 NotifyContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 NotifyContent.BorderSizePixel = 0
-                NotifyContent.Position = UDim2.new(0, 50, 0, 28)
+                NotifyContent.Position = UDim2.new(0, 40, 0.5, 0)
                 NotifyContent.Size = UDim2.new(0, 200, 0, 15)
                 NotifyContent.ZIndex = 132
                 NotifyContent.Font = NeverLose.MainFontBold
                 NotifyContent.Text = Config.Content
                 NotifyContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 NotifyContent.TextSize = 12.000
-                NotifyContent.TextTransparency = 0.650
+                NotifyContent.TextTransparency = 0
                 NotifyContent.TextXAlignment = Enum.TextXAlignment.Left
 
-                local Size1 = TextService:GetTextSize(NotifyName.Text,NotifyName.TextSize,NotifyName.Font,Vector2.new(math.huge,math.huge));
                 local Size2 = TextService:GetTextSize(NotifyContent.Text,NotifyContent.TextSize,NotifyContent.Font,Vector2.new(math.huge,math.huge));
 
-                local MainSize = math.max(Size1.X , Size2.X);
+                local MainSize = Size2.X;
 
-                NotifyFrame.Size = UDim2.new(0, MainSize + 65, 0, 55);
+                NotifyFrame.Size = UDim2.new(0, MainSize + 55, 0, 32);
 
                 shadow:Render(true)
                 
@@ -6567,7 +6562,7 @@ function NeverLose:CreateNotification(positionStr)
                         Position = animTargetPos
                 })
 
-                ContainerFrame.Size = UDim2.new(0, 0, 0, 65)
+                ContainerFrame.Size = UDim2.new(0, 0, 0, 40)
 
                 task.delay(Config.Duration or 5 , LPH_NO_VIRTUALIZE(function()
 
@@ -6589,10 +6584,6 @@ function NeverLose:CreateNotification(positionStr)
 
                         NeverLose.PlayAnimate(LogoImage , SlowyTween , {
                                 ImageTransparency = 1
-                        })
-
-                        NeverLose.PlayAnimate(NotifyName , SlowyTween , {
-                                TextTransparency = 1
                         })
 
                         NeverLose.PlayAnimate(NotifyContent , SlowyTween , {
