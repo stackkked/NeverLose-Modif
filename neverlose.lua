@@ -6579,7 +6579,7 @@ function NeverLose:CreateNotification(positionStr)
                 local preset = presets[string.lower(Config.Type)] or presets.info
                 local finalColor = Config.IconColor or preset.color
                 local finalLogo = Config.Logo or preset.icon
-                local isImage = string.find(finalLogo, "rbxasset") ~= nil
+                local isImage = string.find(finalLogo, "rbxasset") ~= nil or string.find(finalLogo, "rbxthumb") ~= nil
 
                 if NeverLose.__WatermarkCache then
                         NeverLose.PlayAnimate(Notification,SlowyTween , {
@@ -7950,11 +7950,10 @@ function NeverLose:AdminPresence(groupId, ranks)
 			rebuildList()
 
 			Notifier.new({
-				Title = string.format("(%s) %s", player.DisplayName, player.Name),
-				Content = isJoin
-					and ("Joined at " .. admins[player].time .. " (" .. displayRank .. ")")
-					or ("In Server (" .. displayRank .. ")"),
+				Type = "custom",
+				Content = string.format("%s %s", player.Name, isJoin and ("joined (" .. displayRank .. ")") or ("is in server (" .. displayRank .. ")")),
 				Logo = "rbxthumb://type=AvatarHeadShot&id=" .. player.UserId .. "&w=150&h=150",
+				IconColor = Color3.fromRGB(255, 255, 255),
 				Duration = 10
 			})
 		end
