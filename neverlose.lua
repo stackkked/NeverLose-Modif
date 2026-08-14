@@ -1706,7 +1706,7 @@ for i,v in next , NeverLose.KeyEnum do
 end;
 
 function NeverLose:KeyCodeToStr(K: Enum.KeyCode)
-        if typeof(K) == 'string' then
+        function NeverLose:KeyCodeToStr(K) if K == nil or K == "None" then return "None" end;
                 if NeverLose.KeyEnum[K] then
                         return NeverLose.KeyEnum[K];
                 end;
