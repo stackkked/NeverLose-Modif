@@ -6485,6 +6485,8 @@ function NeverLose:CreateWindow(Config)
                                 end
                                 AlignRightText()
                         end
+                        
+                        Bind:SetState(DefaultState or "holding")
 
                         return Bind
                 end
@@ -8010,5 +8012,6 @@ function NeverLose:Unload()
 end;
 
 return NeverLose;
+
 
 
