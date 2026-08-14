@@ -6529,7 +6529,7 @@ function NeverLose:CreateNotification(positionStr)
                         UICorner_2.CornerRadius = UDim.new(0, 5)
                         UICorner_2.Parent = LogoObject
                 else
-                        LogoObject.FontFace = NeverLose:GetIconFont(finalLogo) or NeverLose.BuiltInBold
+                        LogoObject.FontFace = NeverLose.BuiltInBold
                         LogoObject.Text = finalLogo
                         LogoObject.TextColor3 = finalColor
                         LogoObject.TextSize = 18
