@@ -6163,12 +6163,15 @@ function NeverLose:CreateWindow(Config)
 
                                 local isz = 0;
                                 if Icon.Text ~= "" then
-                                        isz = TextService:GetTextSize(Icon.Text,Icon.TextSize,Icon.Font,Vector2.new(math.huge,math.huge)).X;
+                                        local s, res = pcall(function() return TextService:GetTextSize(Icon.Text,Icon.TextSize,Icon.Font,Vector2.new(math.huge,math.huge)).X end)
+                                        isz = s and res or Icon.TextBounds.X
+                                        if isz == 0 then isz = Icon.TextSize end
                                         isz = isz + 4;
                                         Icon.Position = UDim2.new(0, sepOffset + 5, 0.5, 0)
                                 end;
 
-                                local csz = TextService:GetTextSize(Content.Text , Content.TextSize,Content.Font,Vector2.new(math.huge,math.huge)).X
+                                local s2, res2 = pcall(function() return TextService:GetTextSize(Content.Text , Content.TextSize,Content.Font,Vector2.new(math.huge,math.huge)).X end)
+                                local csz = s2 and res2 or Content.TextBounds.X
                                 Content.Position = UDim2.new(0, sepOffset + isz + 10, 0.5, 0)
 
                                 if InnerBlock.Visible then
