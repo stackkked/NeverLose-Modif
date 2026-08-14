@@ -6289,7 +6289,7 @@ function NeverLose:CreateWindow(Config)
                         NameLbl.Size = UDim2.new(1, -20, 1, 0)
                         NameLbl.Font = NeverLose.MainFont
                         NameLbl.Text = Name
-                        NameLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+                        NameLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                         NameLbl.TextStrokeColor3 = NeverLose.AccentColor
                         NameLbl.TextStrokeTransparency = 1
                         NameLbl.TextSize = 12
@@ -6302,7 +6302,7 @@ function NeverLose:CreateWindow(Config)
                         StateLbl.Size = UDim2.new(1, -20, 1, 0)
                         StateLbl.Font = NeverLose.MainFont
                         StateLbl.Text = "[" .. (DefaultState or "holding") .. "]"
-                        StateLbl.TextColor3 = Color3.fromRGB(120, 120, 120)
+                        StateLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                         StateLbl.TextStrokeColor3 = NeverLose.AccentColor
                         StateLbl.TextStrokeTransparency = 1
                         StateLbl.TextSize = 12
@@ -6316,7 +6316,7 @@ function NeverLose:CreateWindow(Config)
                         KeyLbl.Size = UDim2.new(1, -25, 1, 0) -- dynamically sized later
                         KeyLbl.Font = NeverLose.MainFontBold
                         KeyLbl.Text = DefaultKey or "None"
-                        KeyLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+                        KeyLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                         KeyLbl.TextStrokeColor3 = NeverLose.AccentColor
                         KeyLbl.TextStrokeTransparency = 1
                         KeyLbl.TextSize = 12
@@ -6362,9 +6362,9 @@ function NeverLose:CreateWindow(Config)
                                         NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 0.5 })
                                         NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 0.5 })
                                 else
-                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(120, 120, 120), TextStrokeTransparency = 1 })
-                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeTransparency = 1 })
-                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
                                 end
                                 AlignRightText()
                         end
