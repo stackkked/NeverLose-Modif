@@ -6422,12 +6422,14 @@ function NeverLose:CreateNotification(positionStr)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
             UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
             slideStartX, slideEndX = -750, 0
-            notifyAnchor = Vector2.new(0, 0)
+            notifyAnchor = Vector2.new(0, 1)
         elseif positionStr == "BottomRight" then
             Notification.AnchorPoint = Vector2.new(1, 1)
             Notification.Position = UDim2.new(1, -25, 1, -25)
             UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
             UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+            slideStartX, slideEndX = 750, 1
+            notifyAnchor = Vector2.new(1, 1)
         else -- TopRight (default)
             Notification.AnchorPoint = Vector2.new(1, 0)
             Notification.Position = UDim2.new(1, -25, 0, 25)
