@@ -1705,12 +1705,13 @@ for i,v in next , NeverLose.KeyEnum do
         NeverLose.EnumReverse[v] = i;
 end;
 
-function NeverLose:KeyCodeToStr(K: Enum.KeyCode)
-        function NeverLose:KeyCodeToStr(K) if K == nil or K == "None" then return "None" end;
+function NeverLose:KeyCodeToStr(K)
+        if K == nil or K == "None" then return "None" end;
+
+        if type(K) == "string" then
                 if NeverLose.KeyEnum[K] then
                         return NeverLose.KeyEnum[K];
                 end;
-
                 return K;
         end;
 
@@ -8009,3 +8010,4 @@ function NeverLose:Unload()
 end;
 
 return NeverLose;
+
