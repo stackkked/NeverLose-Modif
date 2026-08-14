@@ -5988,17 +5988,6 @@ function NeverLose:CreateWindow(Config)
 			ColorSequenceKeypoint.new(1, NeverLose.AccentColor)
 		})
 		TopLineGradient.Parent = TopLine
-		
-		NeverLose:AddSignal(NeverLose:GetPropertyChangedSignal("AccentColor"):Connect(function()
-			TopLineGradient.Color = ColorSequence.new({
-				ColorSequenceKeypoint.new(0, NeverLose.AccentColor),
-				ColorSequenceKeypoint.new(0.5, Color3.new(
-					math.clamp(NeverLose.AccentColor.R*1.5,0,1), 
-					math.clamp(NeverLose.AccentColor.G*1.5,0,1), 
-					math.clamp(NeverLose.AccentColor.B*1.5,0,1))),
-				ColorSequenceKeypoint.new(1, NeverLose.AccentColor)
-			})
-		end))
 
 		UIListLayout.Parent = Watermark
 		UIListLayout.FillDirection = Enum.FillDirection.Horizontal
