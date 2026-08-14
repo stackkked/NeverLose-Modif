@@ -6461,8 +6461,8 @@ function NeverLose:CreateNotification(positionStr)
                 local presets = {
                         success = { color = Color3.fromRGB(85, 255, 85), icon = "check" },
                         error = { color = Color3.fromRGB(255, 85, 85), icon = "x" },
-                        warning = { color = Color3.fromRGB(255, 170, 0), icon = "alert-triangle" },
-                        info = { color = Color3.fromRGB(85, 170, 255), icon = "info" }
+                        warning = { color = Color3.fromRGB(255, 170, 0), icon = "triangle-exclamation" },
+                        info = { color = Color3.fromRGB(85, 170, 255), icon = "circle-i" }
                 }
                 
                 local preset = presets[string.lower(Config.Type)] or presets.info
