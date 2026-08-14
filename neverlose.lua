@@ -5921,6 +5921,11 @@ function NeverLose:CreateWindow(Config)
                 end;
         end;
 
+        function Window:SetKeybind(key)
+                Window.Keybind = key
+        end;
+
+
         function Window:Watermark(positionStr)
 		if NeverLose.__WatermarkCache then
 			return NeverLose.__WatermarkCache;
@@ -6479,14 +6484,12 @@ function NeverLose:CreateWindow(Config)
                                         NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
                                         NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
                                 else
-                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(120, 120, 120), TextStrokeColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
-                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
-                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeColor3 = Color3.fromRGB(255, 255, 255), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(120, 120, 120), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeTransparency = 1 })
+                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170), TextStrokeTransparency = 1 })
                                 end
                                 AlignRightText()
                         end
-                        
-                        Bind:SetState(DefaultState or "holding")
 
                         return Bind
                 end
@@ -8012,7 +8015,4 @@ function NeverLose:Unload()
 end;
 
 return NeverLose;
-
-
-
 
