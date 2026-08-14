@@ -5978,7 +5978,6 @@ function NeverLose:CreateWindow(Config)
 		TopLine.Size = UDim2.new(1, 0, 0, 1)
 		TopLine.Position = UDim2.new(0, 0, 0, 0)
 		TopLine.ZIndex = 17
-		
 		TopLineGradient.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, NeverLose.AccentColor),
 			ColorSequenceKeypoint.new(0.5, Color3.new(
@@ -6046,6 +6045,30 @@ function NeverLose:CreateWindow(Config)
                                 for i,v in next , Watermark_lb.Renders do
                                         pcall(v,false);
                                 end;
+                        end
+                end;
+
+                function Watermark_lb:SetPosition(posStr)
+                        if posStr == "TopLeft" then
+                                Watermark.AnchorPoint = Vector2.new(0, 0)
+                                NeverLose.PlayAnimate(Watermark, SlowyTween, { Position = UDim2.new(0, 10, 0, 10) })
+                                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+                        elseif posStr == "TopCenter" then
+                                Watermark.AnchorPoint = Vector2.new(0.5, 0)
+                                NeverLose.PlayAnimate(Watermark, SlowyTween, { Position = UDim2.new(0.5, 0, 0, 10) })
+                                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                        elseif posStr == "BottomLeft" then
+                                Watermark.AnchorPoint = Vector2.new(0, 1)
+                                NeverLose.PlayAnimate(Watermark, SlowyTween, { Position = UDim2.new(0, 10, 1, -10) })
+                                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+                        elseif posStr == "BottomRight" then
+                                Watermark.AnchorPoint = Vector2.new(1, 1)
+                                NeverLose.PlayAnimate(Watermark, SlowyTween, { Position = UDim2.new(1, -10, 1, -10) })
+                                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+                        else
+                                Watermark.AnchorPoint = Vector2.new(1, 0)
+                                NeverLose.PlayAnimate(Watermark, SlowyTween, { Position = UDim2.new(1, -10, 0, 10) })
+                                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
                         end
                 end;
 
