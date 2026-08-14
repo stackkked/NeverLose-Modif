@@ -6453,20 +6453,22 @@ function NeverLose:CreateNotification(positionStr)
                 Config = NeverLose:ProcessParams(Config , {
                         Type = "info",
                         Content = "Hello World!",
-                        Logo = NeverLose.GlobalLogo or "rbxasset://textures/ui/VerifiedBadgeNameIcon.png",
+                        Logo = nil,
                         IconColor = nil,
                         Duration = 5,
                 });
 
                 local presets = {
-                        success = Color3.fromRGB(85, 255, 85),
-                        error = Color3.fromRGB(255, 85, 85),
-                        warning = Color3.fromRGB(255, 170, 0),
-                        info = Color3.fromRGB(85, 170, 255)
+                        success = { color = Color3.fromRGB(85, 255, 85), icon = "check" },
+                        error = { color = Color3.fromRGB(255, 85, 85), icon = "x" },
+                        warning = { color = Color3.fromRGB(255, 170, 0), icon = "alert-triangle" },
+                        info = { color = Color3.fromRGB(85, 170, 255), icon = "info" }
                 }
                 
-                local presetColor = presets[string.lower(Config.Type)] or presets.info
-                local finalColor = Config.IconColor or presetColor
+                local preset = presets[string.lower(Config.Type)] or presets.info
+                local finalColor = Config.IconColor or preset.color
+                local finalLogo = Config.Logo or preset.icon
+                local isImage = string.find(finalLogo, "rbxasset") ~= nil
 
                 if NeverLose.__WatermarkCache then
                         NeverLose.PlayAnimate(Notification,SlowyTween , {
@@ -6478,8 +6480,7 @@ function NeverLose:CreateNotification(positionStr)
                 local NotifyFrame = Instance.new("Frame")
                 local UICorner = Instance.new("UICorner")
                 local UIStroke = Instance.new("UIStroke")
-                local LogoImage = Instance.new("ImageLabel")
-                local UICorner_2 = Instance.new("UICorner")
+                local LogoObject = isImage and Instance.new("ImageLabel") or Instance.new("TextLabel")
                 local NotifyContent = Instance.new("TextLabel");
                 local shadow = NeverLose:CreateShadow(NotifyFrame , true);
 
@@ -6510,21 +6511,31 @@ function NeverLose:CreateNotification(positionStr)
                 UIStroke.Color = Color3.fromRGB(45, 48, 58)
                 UIStroke.Parent = NotifyFrame
 
-                LogoImage.Name = NeverLose.RandomString();
-                LogoImage.Parent = NotifyFrame
-                LogoImage.AnchorPoint = Vector2.new(0, 0.5)
-                LogoImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                LogoImage.BackgroundTransparency = 1.000
-                LogoImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
-                LogoImage.BorderSizePixel = 0
-                LogoImage.Position = UDim2.new(0, 10, 0.5, 0)
-                LogoImage.Size = UDim2.new(0, 20, 0, 20)
-                LogoImage.ZIndex = 131
-                LogoImage.Image = Config.Logo
-                LogoImage.ImageColor3 = finalColor;
+                LogoObject.Name = NeverLose.RandomString();
+                LogoObject.Parent = NotifyFrame
+                LogoObject.AnchorPoint = Vector2.new(0, 0.5)
+                LogoObject.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                LogoObject.BackgroundTransparency = 1.000
+                LogoObject.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                LogoObject.BorderSizePixel = 0
+                LogoObject.Position = UDim2.new(0, 10, 0.5, 0)
+                LogoObject.Size = UDim2.new(0, 20, 0, 20)
+                LogoObject.ZIndex = 131
 
-                UICorner_2.CornerRadius = UDim.new(0, 5)
-                UICorner_2.Parent = LogoImage
+                if isImage then
+                        LogoObject.Image = finalLogo
+                        LogoObject.ImageColor3 = finalColor;
+                        local UICorner_2 = Instance.new("UICorner")
+                        UICorner_2.CornerRadius = UDim.new(0, 5)
+                        UICorner_2.Parent = LogoObject
+                else
+                        LogoObject.FontFace = NeverLose:GetIconFont(finalLogo) or NeverLose.BuiltInBold
+                        LogoObject.Text = finalLogo
+                        LogoObject.TextColor3 = finalColor
+                        LogoObject.TextSize = 18
+                        LogoObject.TextXAlignment = Enum.TextXAlignment.Center
+                        LogoObject.TextYAlignment = Enum.TextYAlignment.Center
+                end
 
                 NotifyContent.Name = NeverLose.RandomString();
                 NotifyContent.Parent = NotifyFrame
@@ -6582,9 +6593,15 @@ function NeverLose:CreateNotification(positionStr)
                                 Transparency = 1
                         })
 
-                        NeverLose.PlayAnimate(LogoImage , SlowyTween , {
-                                ImageTransparency = 1
-                        })
+                        if isImage then
+                                NeverLose.PlayAnimate(LogoObject , SlowyTween , {
+                                        ImageTransparency = 1
+                                })
+                        else
+                                NeverLose.PlayAnimate(LogoObject , SlowyTween , {
+                                        TextTransparency = 1
+                                })
+                        end
 
                         NeverLose.PlayAnimate(NotifyContent , SlowyTween , {
                                 TextTransparency = 1
