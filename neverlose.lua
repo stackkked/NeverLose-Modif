@@ -206,6 +206,8 @@ NeverLose.NameRegisitry = {};
 NeverLose.IsMosueOverOtherFrame = false;
 NeverLose.GlobalLogo = "rbxassetid://120358385035996";
 NeverLose.ImageColorMapping = "rbxassetid://4155801252";
+NeverLose.MainFont = NeverLose.MainFont;
+NeverLose.MainFontBold = NeverLose.MainFontBold;
 
 if getcustomasset then
         local link = "https://github.com/4lpaca-pin/NeverLose/blob/main/assets/%s?raw=true";
@@ -1490,7 +1492,7 @@ function NeverLose:CreateColorPicker(HandleFrame: Frame)
         RGBLabel.Position = UDim2.new(0, 10, 0, 217)
         RGBLabel.Size = UDim2.new(1, -20, 0, 15)
         RGBLabel.ZIndex = ZIndex + 127
-        RGBLabel.Font = Enum.Font.GothamBold
+        RGBLabel.Font = NeverLose.MainFontBold
         RGBLabel.Text = "#FFFFFF"
         RGBLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         RGBLabel.TextSize = 12.000
@@ -1866,7 +1868,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                         return (Config.Default - Config.Min) / (Config.Max - Config.Min);
                 end);
 
-                local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+                local FullNumSize = TextService:GetTextSize(string.rep("0",(Config.Rounding + #tostring(Config.Max))+1)..tostring(Config.Type),10,NeverLose.MainFont,Vector2.new(math.huge,math.huge));
 
                 SliderLib.MaximumSize = FullNumSize.X;
 
@@ -1874,7 +1876,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                         local nszie = 0;
 
                         for i,ns in next , Config.Nums do
-                                local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,Enum.Font.GothamMedium,Vector2.new(math.huge,math.huge));
+                                local size = TextService:GetTextSize(string.rep("m",string.len(tostring(ns))),10,NeverLose.MainFont,Vector2.new(math.huge,math.huge));
 
                                 if nszie < size.X then
                                         nszie = size.X;
@@ -1943,7 +1945,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                 ValueLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
                 ValueLabel.Size = UDim2.new(1, 0, 1, 0)
                 ValueLabel.ZIndex = ZINdex + 14
-                ValueLabel.Font = Enum.Font.GothamMedium
+                ValueLabel.Font = NeverLose.MainFont
                 ValueLabel.Text = tostring(Config.Default)..tostring(Config.Type);
                 ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 ValueLabel.TextSize = 10.000
@@ -2444,7 +2446,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                 ValueLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
                 ValueLabel.Size = UDim2.new(1, 0, 1, 0)
                 ValueLabel.ZIndex = ZINdex + 14
-                ValueLabel.Font = Enum.Font.GothamMedium
+                ValueLabel.Font = NeverLose.MainFont
                 ValueLabel.Text = NeverLose:KeyCodeToStr(Config.Default or "None")
                 ValueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 ValueLabel.TextSize = 10.000
@@ -2598,7 +2600,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                 TextBox.Size = UDim2.new(1, -5, 0, 17)
                 TextBox.ZIndex = ZINdex + 14
                 TextBox.ClearTextOnFocus = false
-                TextBox.Font = Enum.Font.GothamMedium
+                TextBox.Font = NeverLose.MainFont
                 TextBox.PlaceholderText = Config.Placeholder
                 TextBox.Text = tostring(Config.Default)
                 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -2731,7 +2733,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                 BasedLabel.Position = UDim2.new(0, 5, 0.5, 0)
                 BasedLabel.Size = UDim2.new(1, -25, 0, 15)
                 BasedLabel.ZIndex = ZINdex + 14
-                BasedLabel.Font = Enum.Font.GothamMedium
+                BasedLabel.Font = NeverLose.MainFont
                 BasedLabel.Text = NeverLose.ParseDropdown(Config.Default);
                 BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 BasedLabel.TextSize = 12.000
@@ -2988,7 +2990,7 @@ function NeverLose:RegisiterHandler(Handler: Frame , Signal)
                                 ItemLabel.Position = UDim2.new(0, 15, 0, 4)
                                 ItemLabel.Size = UDim2.new(0,1, 0, 15)
                                 ItemLabel.ZIndex = ZINdex + 1258
-                                ItemLabel.Font = Enum.Font.GothamMedium
+                                ItemLabel.Font = NeverLose.MainFont
                                 ItemLabel.Text = tostring(Value);
                                 ItemLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                                 ItemLabel.TextSize = 13.000
@@ -3275,7 +3277,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
         TooltipName.Position = UDim2.new(0, 15, 0, 5)
         TooltipName.Size = UDim2.new(0, 1, 0, 20)
         TooltipName.ZIndex = 132
-        TooltipName.Font = Enum.Font.GothamBold
+        TooltipName.Font = NeverLose.MainFontBold
         TooltipName.Text = Name
         TooltipName.TextColor3 = Color3.fromRGB(255, 255, 255)
         TooltipName.TextSize = 15.000
@@ -3290,7 +3292,7 @@ function NeverLose:CreateToolTips(Container: Frame , Name: string , Content: str
         TooltipContent.Position = UDim2.new(0, 15, 0, 30)
         TooltipContent.Size = UDim2.new(0, 1, 0, 15)
         TooltipContent.ZIndex = 132
-        TooltipContent.Font = Enum.Font.GothamBold
+        TooltipContent.Font = NeverLose.MainFontBold
         TooltipContent.Text = Content
         TooltipContent.TextColor3 = Color3.fromRGB(255, 255, 255)
         TooltipContent.TextSize = 12.000
@@ -3428,7 +3430,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
                 BasedLabel.Position = UDim2.new(0, 11, 0, 6)
                 BasedLabel.Size = UDim2.new(0,1, 0, 15)
                 BasedLabel.ZIndex = LayerIndex + 9
-                BasedLabel.Font = Enum.Font.GothamMedium
+                BasedLabel.Font = NeverLose.MainFont
                 BasedLabel.Text = Name
                 BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 BasedLabel.TextSize = 13.000
@@ -3595,7 +3597,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
                 BasedLabel.Position = UDim2.new(0, 35, 0, 6)
                 BasedLabel.Size = UDim2.new(0,1, 0, 15)
                 BasedLabel.ZIndex = LayerIndex + 9
-                BasedLabel.Font = Enum.Font.GothamMedium
+                BasedLabel.Font = NeverLose.MainFont
                 BasedLabel.Text = Config.Name;
                 BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 BasedLabel.TextSize = 13.000
@@ -3729,7 +3731,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
                 UserLabel.Position = UDim2.new(0, 65, 0, 10)
                 UserLabel.Size = UDim2.new(1, -35, 0, 15)
                 UserLabel.ZIndex = LayerIndex + 9
-                UserLabel.Font = Enum.Font.GothamMedium
+                UserLabel.Font = NeverLose.MainFont
                 UserLabel.Text = Name or 'User'
                 UserLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 UserLabel.TextSize = 13.000
@@ -3773,7 +3775,7 @@ function NeverLose:RegisiterItem(Frame: Frame , Signel)
                 UserStatusLabel.Position = UDim2.new(0, 65, 0, 25)
                 UserStatusLabel.Size = UDim2.new(1, -35, 0, 15)
                 UserStatusLabel.ZIndex = LayerIndex + 9
-                UserStatusLabel.Font = Enum.Font.GothamMedium
+                UserStatusLabel.Font = NeverLose.MainFont
                 UserStatusLabel.Text = Expires or 'Never'
                 UserStatusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 UserStatusLabel.TextSize = 13.000
@@ -4202,7 +4204,7 @@ function NeverLose:CreateWindow(Config)
         WindowName.Position = UDim2.new(0, 55, 0, 4)
         WindowName.Size = UDim2.new(0, 200, 0, 25)
         WindowName.ZIndex = 7
-        WindowName.Font = Enum.Font.GothamBold
+        WindowName.Font = NeverLose.MainFontBold
         WindowName.Text = Window.Name
         WindowName.TextColor3 = Color3.fromRGB(255, 255, 255)
         WindowName.TextSize = 18.000
@@ -4217,7 +4219,7 @@ function NeverLose:CreateWindow(Config)
         WindowContent.Position = UDim2.new(0, 55, 0, 25)
         WindowContent.Size = UDim2.new(0, 200, 0, 15)
         WindowContent.ZIndex = 7
-        WindowContent.Font = Enum.Font.GothamBold
+        WindowContent.Font = NeverLose.MainFontBold
         WindowContent.Text = Window.Content
         WindowContent.TextColor3 = Color3.fromRGB(255, 255, 255)
         WindowContent.TextSize = 9.000
@@ -4292,7 +4294,7 @@ function NeverLose:CreateWindow(Config)
         AccountName.Position = UDim2.new(0, 55, 0, 5)
         AccountName.Size = UDim2.new(0, 100, 0, 25)
         AccountName.ZIndex = 7
-        AccountName.Font = Enum.Font.GothamBold
+        AccountName.Font = NeverLose.MainFontBold
         AccountName.Text = ""
         AccountName.TextColor3 = Color3.fromRGB(255, 255, 255)
         AccountName.TextSize = 14.000
@@ -4308,7 +4310,7 @@ function NeverLose:CreateWindow(Config)
         ExpireLabel.Position = UDim2.new(0, 55, 0, 25)
         ExpireLabel.Size = UDim2.new(0, 200, 0, 15)
         ExpireLabel.ZIndex = 7
-        ExpireLabel.Font = Enum.Font.GothamBold
+        ExpireLabel.Font = NeverLose.MainFontBold
         ExpireLabel.Text = "never"
         ExpireLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         ExpireLabel.TextSize = 10.000
@@ -4446,7 +4448,7 @@ function NeverLose:CreateWindow(Config)
         ConfigName.Position = UDim2.new(0, 40, 0.5, 0)
         ConfigName.Size = UDim2.new(1, -7, 0, 15)
         ConfigName.ZIndex = 9
-        ConfigName.Font = Enum.Font.GothamMedium
+        ConfigName.Font = NeverLose.MainFont
         ConfigName.Text = "Default"
         ConfigName.TextColor3 = Color3.fromRGB(255, 255, 255)
         ConfigName.TextSize = 12.000
@@ -4510,7 +4512,7 @@ function NeverLose:CreateWindow(Config)
         SearchBox.Size = UDim2.new(1, -35, 0, 25)
         SearchBox.ZIndex = 12
         SearchBox.ClearTextOnFocus = false
-        SearchBox.Font = Enum.Font.GothamMedium
+        SearchBox.Font = NeverLose.MainFont
         SearchBox.PlaceholderText = "Search"
         SearchBox.Text = ""
         SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -4699,7 +4701,7 @@ function NeverLose:CreateWindow(Config)
                 TabLabel.BorderSizePixel = 0
                 TabLabel.Size = UDim2.new(1, -7, 0, 15)
                 TabLabel.ZIndex = 8
-                TabLabel.Font = Enum.Font.GothamMedium
+                TabLabel.Font = NeverLose.MainFont
                 TabLabel.Text = Name
                 TabLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TabLabel.TextSize = 11.000
@@ -4779,7 +4781,7 @@ function NeverLose:CreateWindow(Config)
                 TabContentLabel.Position = UDim2.new(0, 30, 0.5, 0)
                 TabContentLabel.Size = UDim2.new(1, -7, 0, 15)
                 TabContentLabel.ZIndex = 9
-                TabContentLabel.Font = Enum.Font.GothamMedium
+                TabContentLabel.Font = NeverLose.MainFont
                 TabContentLabel.Text = Config.Name
                 TabContentLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TabContentLabel.TextSize = 12.000
@@ -5001,7 +5003,7 @@ function NeverLose:CreateWindow(Config)
                         SectionLabel.Position = UDim2.new(0.5, 0, 0, 0)
                         SectionLabel.Size = UDim2.new(1, -35, 0, 15)
                         SectionLabel.ZIndex = 9
-                        SectionLabel.Font = Enum.Font.GothamMedium
+                        SectionLabel.Font = NeverLose.MainFont
                         SectionLabel.Text = Config.Name
                         SectionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                         SectionLabel.TextSize = 11.000
@@ -5245,7 +5247,7 @@ function NeverLose:CreateWindow(Config)
                 BasedLabel.Position = UDim2.new(0, 11, 0, 6)
                 BasedLabel.Size = UDim2.new(0,1, 0, 15)
                 BasedLabel.ZIndex = 154
-                BasedLabel.Font = Enum.Font.GothamMedium
+                BasedLabel.Font = NeverLose.MainFont
                 BasedLabel.Text = "Config"
                 BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 BasedLabel.TextSize = 13.000
@@ -5320,7 +5322,7 @@ function NeverLose:CreateWindow(Config)
                 TextBox.Size = UDim2.new(1, -5, 0, 17)
                 TextBox.ZIndex = 154
                 TextBox.ClearTextOnFocus = false
-                TextBox.Font = Enum.Font.GothamMedium
+                TextBox.Font = NeverLose.MainFont
                 TextBox.PlaceholderText = "Config Name ..."
                 TextBox.Text = ""
                 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -5586,7 +5588,7 @@ function NeverLose:CreateWindow(Config)
                                 BasedLabel.Position = UDim2.new(0, 11, 0, 7)
                                 BasedLabel.Size = UDim2.new(0, 1, 0, 15)
                                 BasedLabel.ZIndex = 153
-                                BasedLabel.Font = Enum.Font.GothamMedium
+                                BasedLabel.Font = NeverLose.MainFont
                                 BasedLabel.Text = ConfigNameStr
                                 BasedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                                 BasedLabel.TextSize = 13.000
@@ -6051,7 +6053,7 @@ function NeverLose:CreateWindow(Config)
                         Content.Position = UDim2.new(0, 35, 0.5, 0)
                         Content.Size = UDim2.new(0, 1, 0, 25)
                         Content.ZIndex = 17
-                        Content.Font = Enum.Font.GothamBold
+                        Content.Font = NeverLose.MainFontBold
                         Content.Text = Name
                         Content.TextColor3 = Color3.fromRGB(186, 186, 186)
                         Content.TextSize = 15.000
@@ -6203,7 +6205,7 @@ function NeverLose:CreateWindow(Config)
                 TitleLbl.Parent = KBFrame
                 TitleLbl.BackgroundTransparency = 1
                 TitleLbl.Size = UDim2.new(1, 0, 0, 25)
-                TitleLbl.Font = Enum.Font.GothamBold
+                TitleLbl.Font = NeverLose.MainFontBold
                 TitleLbl.Text = "keybinds"
                 TitleLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TitleLbl.TextSize = 13
@@ -6285,7 +6287,7 @@ function NeverLose:CreateWindow(Config)
                         NameLbl.BackgroundTransparency = 1
                         NameLbl.Position = UDim2.new(0, 10, 0, 0)
                         NameLbl.Size = UDim2.new(1, -20, 1, 0)
-                        NameLbl.Font = Enum.Font.GothamMedium
+                        NameLbl.Font = NeverLose.MainFont
                         NameLbl.Text = Name
                         NameLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
                         NameLbl.TextSize = 12
@@ -6296,7 +6298,7 @@ function NeverLose:CreateWindow(Config)
                         StateLbl.BackgroundTransparency = 1
                         StateLbl.Position = UDim2.new(0, 10, 0, 0)
                         StateLbl.Size = UDim2.new(1, -20, 1, 0)
-                        StateLbl.Font = Enum.Font.GothamMedium
+                        StateLbl.Font = NeverLose.MainFont
                         StateLbl.Text = "[" .. (DefaultState or "holding") .. "]"
                         StateLbl.TextColor3 = Color3.fromRGB(120, 120, 120)
                         StateLbl.TextSize = 12
@@ -6308,14 +6310,14 @@ function NeverLose:CreateWindow(Config)
                         KeyLbl.BackgroundTransparency = 1
                         KeyLbl.Position = UDim2.new(0, 10, 0, 0)
                         KeyLbl.Size = UDim2.new(1, -25, 1, 0) -- dynamically sized later
-                        KeyLbl.Font = Enum.Font.GothamBold
+                        KeyLbl.Font = NeverLose.MainFontBold
                         KeyLbl.Text = DefaultKey or "None"
                         KeyLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
                         KeyLbl.TextSize = 12
                         KeyLbl.TextXAlignment = Enum.TextXAlignment.Right
                         
                         local function AlignRightText()
-                                local sWidth = TextService:GetTextSize(StateLbl.Text, 12, Enum.Font.GothamMedium, Vector2.new(9999, 20)).X
+                                local sWidth = TextService:GetTextSize(StateLbl.Text, 12, NeverLose.MainFont, Vector2.new(9999, 20)).X
                                 KeyLbl.Size = UDim2.new(1, -(20 + sWidth + 5), 1, 0)
                         end
                         AlignRightText()
@@ -6505,7 +6507,7 @@ function NeverLose:CreateNotification(positionStr)
                 NotifyName.Position = UDim2.new(0, 50, 0, 7)
                 NotifyName.Size = UDim2.new(0, 200, 0, 20)
                 NotifyName.ZIndex = 132
-                NotifyName.Font = Enum.Font.GothamBold
+                NotifyName.Font = NeverLose.MainFontBold
                 NotifyName.Text = Config.Title
                 NotifyName.TextColor3 = Color3.fromRGB(255, 255, 255)
                 NotifyName.TextSize = 17.000
@@ -6520,7 +6522,7 @@ function NeverLose:CreateNotification(positionStr)
                 NotifyContent.Position = UDim2.new(0, 50, 0, 28)
                 NotifyContent.Size = UDim2.new(0, 200, 0, 15)
                 NotifyContent.ZIndex = 132
-                NotifyContent.Font = Enum.Font.GothamBold
+                NotifyContent.Font = NeverLose.MainFontBold
                 NotifyContent.Text = Config.Content
                 NotifyContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 NotifyContent.TextSize = 12.000
@@ -6660,7 +6662,7 @@ function NeverLose:CreateLogger()
                 LogContent.Position = UDim2.new(0, 25, 0, 2)
                 LogContent.Size = UDim2.new(0, 200, 0, 15)
                 LogContent.ZIndex = 132
-                LogContent.Font = Enum.Font.GothamBold
+                LogContent.Font = NeverLose.MainFontBold
                 LogContent.Text = Message
                 LogContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 LogContent.TextSize = 12.000
@@ -6874,7 +6876,7 @@ function NeverLose:CreateIndicator()
                 Content.Position = UDim2.new(0, 40, 0.5, 0)
                 Content.Size = UDim2.new(1, -40, 0, 25)
                 Content.ZIndex = 17
-                Content.Font = Enum.Font.GothamBold
+                Content.Font = NeverLose.MainFontBold
                 Content.Text = Config.Name
                 Content.TextColor3 = Color3.fromRGB(186, 186, 186)
                 Content.TextSize = 20.000
@@ -7084,7 +7086,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	CounterLabel.BorderSizePixel = 0
 	CounterLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 	CounterLabel.Size = UDim2.new(0, 60, 1, 0)
-	CounterLabel.Font = Enum.Font.GothamBold
+	CounterLabel.Font = NeverLose.MainFontBold
 	CounterLabel.Text = "1 / 1"
 	CounterLabel.TextColor3 = Color3.fromRGB(160, 160, 160)
 	CounterLabel.TextSize = 11
@@ -7144,7 +7146,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	DispName.BorderSizePixel = 0
 	DispName.Position = UDim2.new(0, 70, 0, 6)
 	DispName.Size = UDim2.new(1, -82, 0, 17)
-	DispName.Font = Enum.Font.GothamBold
+	DispName.Font = NeverLose.MainFontBold
 	DispName.Text = ""
 	DispName.TextColor3 = Color3.fromRGB(255, 255, 255)
 	DispName.TextSize = 14
@@ -7161,7 +7163,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	UserNameLabel.BorderSizePixel = 0
 	UserNameLabel.Position = UDim2.new(0, 70, 0, 24)
 	UserNameLabel.Size = UDim2.new(1, -82, 0, 13)
-	UserNameLabel.Font = Enum.Font.GothamMedium
+	UserNameLabel.Font = NeverLose.MainFont
 	UserNameLabel.Text = ""
 	UserNameLabel.TextColor3 = Color3.fromRGB(130, 130, 130)
 	UserNameLabel.TextSize = 11
@@ -7177,7 +7179,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	RoleLabel.BorderSizePixel = 0
 	RoleLabel.Position = UDim2.new(0, 70, 0, 39)
 	RoleLabel.Size = UDim2.new(1, -82, 0, 13)
-	RoleLabel.Font = Enum.Font.GothamMedium
+	RoleLabel.Font = NeverLose.MainFont
 	RoleLabel.Text = ""
 	RoleLabel.TextColor3 = NeverLose.AccentColor
 	RoleLabel.TextSize = 11
@@ -7219,7 +7221,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	ActionLabel.BorderSizePixel = 0
 	ActionLabel.Position = UDim2.new(0, 32, 0, 65)
 	ActionLabel.Size = UDim2.new(1, -44, 0, 15)
-	ActionLabel.Font = Enum.Font.GothamMedium
+	ActionLabel.Font = NeverLose.MainFont
 	ActionLabel.Text = ""
 	ActionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 	ActionLabel.TextSize = 11
@@ -7303,7 +7305,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 		lbl.BorderSizePixel = 0
 		lbl.Position = UDim2.new(0, 24, 0.5, 0)
 		lbl.Size = UDim2.new(1, -30, 0, 14)
-		lbl.Font = Enum.Font.GothamMedium
+		lbl.Font = NeverLose.MainFont
 		lbl.Text = label
 		lbl.TextColor3 = Color3.fromRGB(190, 190, 190)
 		lbl.TextSize = 11
@@ -7368,7 +7370,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	ConfTitle.BorderSizePixel = 0
 	ConfTitle.Position = UDim2.new(0, 14, 0, 10)
 	ConfTitle.Size = UDim2.new(1, -28, 0, 16)
-	ConfTitle.Font = Enum.Font.GothamBold
+	ConfTitle.Font = NeverLose.MainFontBold
 	ConfTitle.Text = "Teleport Confirmation"
 	ConfTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 	ConfTitle.TextSize = 13
@@ -7383,7 +7385,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	ConfDesc.BorderSizePixel = 0
 	ConfDesc.Position = UDim2.new(0, 14, 0, 30)
 	ConfDesc.Size = UDim2.new(1, -28, 0, 14)
-	ConfDesc.Font = Enum.Font.GothamMedium
+	ConfDesc.Font = NeverLose.MainFont
 	ConfDesc.Text = ""
 	ConfDesc.TextColor3 = Color3.fromRGB(150, 150, 150)
 	ConfDesc.TextSize = 11
@@ -7425,7 +7427,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	YesLbl.BackgroundTransparency = 1
 	YesLbl.Position = UDim2.new(0.5, 0, 0.5, 0)
 	YesLbl.Size = UDim2.new(1, 0, 1, 0)
-	YesLbl.Font = Enum.Font.GothamBold
+	YesLbl.Font = NeverLose.MainFontBold
 	YesLbl.Text = "Confirm"
 	YesLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 	YesLbl.TextSize = 12
@@ -7454,7 +7456,7 @@ function NeverLose:AdminPresence(groupId, ranks)
 	NoLbl.BackgroundTransparency = 1
 	NoLbl.Position = UDim2.new(0.5, 0, 0.5, 0)
 	NoLbl.Size = UDim2.new(1, 0, 1, 0)
-	NoLbl.Font = Enum.Font.GothamBold
+	NoLbl.Font = NeverLose.MainFontBold
 	NoLbl.Text = "Cancel"
 	NoLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 	NoLbl.TextSize = 12
