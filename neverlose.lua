@@ -6289,7 +6289,7 @@ function NeverLose:CreateWindow(Config)
                         NameLbl.Size = UDim2.new(1, -20, 1, 0)
                         NameLbl.Font = NeverLose.MainFont
                         NameLbl.Text = Name
-                        NameLbl.TextColor3 = Color3.fromRGB(170, 170, 170)
+                        NameLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
                         NameLbl.TextSize = 12
                         NameLbl.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -6357,7 +6357,7 @@ function NeverLose:CreateWindow(Config)
                                         NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255) })
                                 else
                                         NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(120, 120, 120) })
-                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170) })
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255) })
                                         NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextColor3 = Color3.fromRGB(170, 170, 170) })
                                 end
                                 AlignRightText()
