@@ -6224,6 +6224,7 @@ function NeverLose:CreateWindow(Config)
                 ContentFrame.BackgroundTransparency = 1
                 ContentFrame.Position = UDim2.new(0, 0, 0, 26)
                 ContentFrame.Size = UDim2.new(1, 0, 1, -26)
+                ContentFrame.ZIndex = 16
 
                 UIListLayout.Parent = ContentFrame
                 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -6281,6 +6282,7 @@ function NeverLose:CreateWindow(Config)
                         Row.Parent = ContentFrame
                         Row.BackgroundTransparency = 1
                         Row.Size = UDim2.new(1, 0, 0, 20)
+                        Row.ZIndex = 16
                         
                         local NameLbl = Instance.new("TextLabel")
                         NameLbl.Parent = Row
@@ -6293,6 +6295,7 @@ function NeverLose:CreateWindow(Config)
                         NameLbl.TextStrokeColor3 = NeverLose.AccentColor
                         NameLbl.TextStrokeTransparency = 1
                         NameLbl.TextSize = 12
+                        NameLbl.ZIndex = 16
                         NameLbl.TextXAlignment = Enum.TextXAlignment.Left
 
                         local StateLbl = Instance.new("TextLabel")
@@ -6306,6 +6309,7 @@ function NeverLose:CreateWindow(Config)
                         StateLbl.TextStrokeColor3 = NeverLose.AccentColor
                         StateLbl.TextStrokeTransparency = 1
                         StateLbl.TextSize = 12
+                        StateLbl.ZIndex = 16
                         StateLbl.TextXAlignment = Enum.TextXAlignment.Right
                         
                         -- Reserve space for state text
@@ -6320,6 +6324,7 @@ function NeverLose:CreateWindow(Config)
                         KeyLbl.TextStrokeColor3 = NeverLose.AccentColor
                         KeyLbl.TextStrokeTransparency = 1
                         KeyLbl.TextSize = 12
+                        KeyLbl.ZIndex = 16
                         KeyLbl.TextXAlignment = Enum.TextXAlignment.Right
                         
                         local function AlignRightText()
