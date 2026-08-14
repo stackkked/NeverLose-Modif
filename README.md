@@ -1,4 +1,4 @@
-﻿# Neverlose.cc UI Library вЂ” Full Reference
+# Neverlose.cc UI Library — Full Reference
 
 ## Loading the Library
 
@@ -8,7 +8,7 @@ local NeverLose = loadstring(game:HttpGet("https://raw.githubusercontent.com/sta
 
 ---
 
-## 2. Global Configuration & Creating a Window
+## 1. Global Configuration & Creating a Window
 
 Before creating a window, you can configure global theme variables, including the main colors and fonts used across the entire UI.
 
@@ -24,7 +24,7 @@ local Window = NeverLose:CreateWindow({
     Logo = "rbxassetid://...",   -- string: Logo image asset (default: built-in NL logo)
     Size = NeverLose.Scales.Default, -- UDim2: Window size (see Scales below)
     ConfigFolder = "MyConfigs",  -- string: Folder name for config saving (default: "NeverLoseConfigs")
-    Keybind = "Insert",          -- string: Key to toggle UI visibility (default: "Insert")
+    Keybind = "Delete",          -- string: Key to toggle UI visibility (default: "Insert")
     Enable3DRenderer = false,    -- boolean: 3D perspective rendering mode (default: false)
 })
 ```
@@ -91,8 +91,6 @@ All elements are added inside a Section. Each `AddLabel` call returns a `handle`
 local label = Section:AddLabel("Enable ESP")
 -- Returns: handle object with methods to attach controls
 ```
-
-The `handle` is the primary building block. You attach toggles, sliders, dropdowns, etc. to it:
 
 ### 4.2 Toggle
 
@@ -274,32 +272,50 @@ handle:ToolTip("Description")     -- attach a hover tooltip
 
 ---
 
-## 6. Watermark
+## 6. CS2 Styled Watermark
+
+The Watermark in this library uses a clean CS2-like aesthetic. It features dynamic scaling and automatic `|` separators between blocks.
 
 ```lua
-local watermark = Window:Watermark()
+local watermark = Window:Watermark("TopRight") -- Positions: TopLeft, TopCenter, TopRight, BottomLeft, BottomRight
 
-local block = watermark:AddBlock({
-    Name = "FPS",
-    Value = "0"
-})
+-- You can change the position at any time dynamically:
+watermark:SetPosition("BottomLeft")
 
-watermark:SetRender(true)  -- show/hide the watermark
+-- Add text blocks with font-awesome icons (or empty string for no icon)
+local fpsBlock = watermark:AddBlock("crosshairs", "FPS: 144")
+local pingBlock = watermark:AddBlock("lightning-bolt", "Ping: 45ms")
+
+watermark:SetRender(true)  -- Show/hide the entire watermark
+
+-- Block Methods:
+fpsBlock:Update("FPS: 120")   -- Update the block's text (watermark smoothly resizes)
+pingBlock:SetVisible(false)   -- Hide the block (separators auto-update)
 ```
 
 ---
 
 ## 7. Notification System
 
+The Notification system has been completely redesigned with a **THIN** aesthetic, eliminating the bulky title. It features built-in presets that automatically determine the icon and color based on the `Type`.
+
 ```lua
 local Notifier = NeverLose:CreateNotification()
 
+-- Presets: "success" (green check), "error" (red x), "warning" (yellow triangle), "info" (blue circle)
 Notifier.new({
-    Type = "info",                 -- string: preset ("success", "error", "warning", "info")
-    Content = "Something happened",-- string: notification body
-    Logo = "rbxassetid://...",     -- string|nil: custom image override
-    IconColor = Color3.new(1,1,1), -- Color3|nil: custom color override
-    Duration = 5                   -- number: seconds before auto-dismiss
+    Type = "warning",                 -- string: preset type
+    Content = "You have been warned!",-- string: notification body text
+    Duration = 5                      -- number: seconds before auto-dismiss
+})
+
+-- Custom notifications:
+Notifier.new({
+    Type = "custom",                   -- string: "custom" avoids using built-in presets
+    Content = "Headshot Player1 from 15 studs",
+    CustomIcon = "crosshairs",         -- string: font-awesome icon name
+    IconColor = Color3.fromRGB(255, 0, 255), -- Color3: icon color
+    Duration = 3
 })
 ```
 
@@ -397,48 +413,4 @@ NeverLose:KeyCodeToStr(Enum.KeyCode.F)   -- "F"
 NeverLose:StrToKeyCode("F")              -- Enum.KeyCode.F
 NeverLose.Base64Encode("hello")          -- base64 string
 NeverLose.Base64Decode("aGVsbG8=")       -- "hello"
-```
-
----
-
-## Full Example
-
-```lua
-local NeverLose = loadstring(game:HttpGet("https://raw.githubusercontent.com/stackkked/NeverLose-Modif/refs/heads/main/neverlose.lua"))()
-
-local Window = NeverLose:CreateWindow({
-    Name = "My Script",
-    Content = "SCP Roleplay",
-    Size = NeverLose.Scales.Default,
-    Keybind = "Insert"
-})
-
-local VisualsTab = Window:AddTab({ Name = "Visuals", Icon = "eye" })
-local CombatTab = Window:AddTab({ Name = "Combat", Icon = "crosshairs" })
-local MiscTab = Window:AddTab({ Name = "Misc", Icon = "gear" })
-
-local EspSection = VisualsTab:AddSection({ Name = "ESP" })
-
-local espToggle = EspSection:AddLabel("ESP Enabled")
-espToggle:AddToggle({
-    Default = false,
-    Flag = "esp_on",
-    Callback = function(v) print("ESP:", v) end
-})
-
-local espDist = EspSection:AddLabel("Max Distance")
-espDist:AddSlider({
-    Default = 500, Min = 50, Max = 2000,
-    Type = "m", Rounding = 0,
-    Flag = "esp_dist",
-    Callback = function(v) print("Dist:", v) end
-})
-
-local espColor = EspSection:AddLabel("ESP Color")
-espColor:AddColorPicker({
-    Default = Color3.fromRGB(255, 0, 0),
-    Callback = function(c) print("Color:", c) end
-})
-
-Window:ToggleInterface()
 ```
