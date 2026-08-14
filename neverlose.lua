@@ -5918,36 +5918,58 @@ function NeverLose:CreateWindow(Config)
                 end;
         end;
 
-        function Window:Watermark()
-                if NeverLose.__WatermarkCache then
-                        return NeverLose.__WatermarkCache;
-                end;
+        function Window:Watermark(positionStr)
+		if NeverLose.__WatermarkCache then
+			return NeverLose.__WatermarkCache;
+		end;
 
-                local Watermark_lb = {};
-                local Watermark = Instance.new("Frame")
-                local UICorner = Instance.new("UICorner")
-                local UIListLayout = Instance.new("UIListLayout")
-                local Shadow = NeverLose:CreateShadow(Watermark);
+		positionStr = positionStr or "TopRight"
 
-                Watermark.Name = NeverLose.RandomString();
-                Watermark.Parent = NeverLose.ScreenGui
-                Watermark.AnchorPoint = Vector2.new(1, 0)
-                Watermark.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
-                Watermark.BackgroundTransparency = 0.200
-                Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-                Watermark.BorderSizePixel = 0
-                Watermark.ClipsDescendants = true
-                Watermark.Position = UDim2.new(1, -10, 0, 10)
-                Watermark.Size = UDim2.new(0, 120, 0, 30)
-                Watermark.ZIndex = 16
+		local Watermark_lb = {};
+		local Watermark = Instance.new("Frame")
+		local UICorner = Instance.new("UICorner")
+		local UIListLayout = Instance.new("UIListLayout")
+		local Shadow = NeverLose:CreateShadow(Watermark);
 
-                UICorner.CornerRadius = UDim.new(0, 25)
-                UICorner.Parent = Watermark
+		Watermark.Name = NeverLose.RandomString();
+		Watermark.Parent = NeverLose.ScreenGui
+		
+		if positionStr == "TopLeft" then
+			Watermark.AnchorPoint = Vector2.new(0, 0)
+			Watermark.Position = UDim2.new(0, 10, 0, 10)
+			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+		elseif positionStr == "TopCenter" then
+			Watermark.AnchorPoint = Vector2.new(0.5, 0)
+			Watermark.Position = UDim2.new(0.5, 0, 0, 10)
+			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		elseif positionStr == "BottomLeft" then
+			Watermark.AnchorPoint = Vector2.new(0, 1)
+			Watermark.Position = UDim2.new(0, 10, 1, -10)
+			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+		elseif positionStr == "BottomRight" then
+			Watermark.AnchorPoint = Vector2.new(1, 1)
+			Watermark.Position = UDim2.new(1, -10, 1, -10)
+			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+		else -- TopRight (default)
+			Watermark.AnchorPoint = Vector2.new(1, 0)
+			Watermark.Position = UDim2.new(1, -10, 0, 10)
+			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+		end
 
-                UIListLayout.Parent = Watermark
-                UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-                UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-                UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+		Watermark.BackgroundColor3 = Color3.fromRGB(8, 8, 13)
+		Watermark.BackgroundTransparency = 0.200
+		Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Watermark.BorderSizePixel = 0
+		Watermark.ClipsDescendants = true
+		Watermark.Size = UDim2.new(0, 120, 0, 30)
+		Watermark.ZIndex = 16
+
+		UICorner.CornerRadius = UDim.new(0, 25)
+		UICorner.Parent = Watermark
+
+		UIListLayout.Parent = Watermark
+		UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
                 local empty_space = Instance.new('Frame');
 
@@ -6122,15 +6144,236 @@ function NeverLose:CreateWindow(Config)
                 return Watermark_lb;
         end;
 
+        function Window:KeybindsList(positionStr)
+                if NeverLose.__KeybindsListCache then
+                        return NeverLose.__KeybindsListCache;
+                end;
+
+                positionStr = positionStr or "CenterLeft"
+
+                local KBList_lb = {};
+                local KBFrame = Instance.new("Frame")
+                local UICorner = Instance.new("UICorner")
+                local Shadow = NeverLose:CreateShadow(KBFrame)
+                local TitleLbl = Instance.new("TextLabel")
+                local Separator = Instance.new("Frame")
+                
+                local ContentFrame = Instance.new("Frame")
+                local UIListLayout = Instance.new("UIListLayout")
+
+                KBFrame.Name = NeverLose.RandomString()
+                KBFrame.Parent = NeverLose.ScreenGui
+                
+                if positionStr == "TopLeft" then
+                        KBFrame.AnchorPoint = Vector2.new(0, 0)
+                        KBFrame.Position = UDim2.new(0, 10, 0, 50)
+                elseif positionStr == "TopCenter" then
+                        KBFrame.AnchorPoint = Vector2.new(0.5, 0)
+                        KBFrame.Position = UDim2.new(0.5, 0, 0, 50)
+                elseif positionStr == "BottomLeft" then
+                        KBFrame.AnchorPoint = Vector2.new(0, 1)
+                        KBFrame.Position = UDim2.new(0, 10, 1, -50)
+                elseif positionStr == "BottomRight" then
+                        KBFrame.AnchorPoint = Vector2.new(1, 1)
+                        KBFrame.Position = UDim2.new(1, -10, 1, -50)
+                elseif positionStr == "CenterLeft" then
+                        KBFrame.AnchorPoint = Vector2.new(0, 0.5)
+                        KBFrame.Position = UDim2.new(0, 10, 0.5, 0)
+                else -- TopRight
+                        KBFrame.AnchorPoint = Vector2.new(1, 0)
+                        KBFrame.Position = UDim2.new(1, -10, 0, 50)
+                end
+
+                KBFrame.BackgroundColor3 = Color3.fromRGB(12, 14, 19)
+                KBFrame.BackgroundTransparency = 0.200
+                KBFrame.BorderSizePixel = 0
+                KBFrame.Size = UDim2.new(0, 200, 0, 25)
+                KBFrame.ClipsDescendants = true
+                KBFrame.ZIndex = 15
+
+                UICorner.CornerRadius = UDim.new(0, 5)
+                UICorner.Parent = KBFrame
+
+                local Stroke = Instance.new("UIStroke")
+                Stroke.Color = Color3.fromRGB(45, 48, 58)
+                Stroke.Transparency = 0
+                Stroke.Parent = KBFrame
+
+                TitleLbl.Name = NeverLose.RandomString()
+                TitleLbl.Parent = KBFrame
+                TitleLbl.BackgroundTransparency = 1
+                TitleLbl.Size = UDim2.new(1, 0, 0, 25)
+                TitleLbl.Font = Enum.Font.GothamBold
+                TitleLbl.Text = "keybinds"
+                TitleLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                TitleLbl.TextSize = 13
+                TitleLbl.ZIndex = 16
+
+                Separator.Name = NeverLose.RandomString()
+                Separator.Parent = KBFrame
+                Separator.BackgroundColor3 = Color3.fromRGB(45, 48, 58)
+                Separator.BorderSizePixel = 0
+                Separator.Position = UDim2.new(0, 0, 0, 25)
+                Separator.Size = UDim2.new(1, 0, 0, 1)
+                Separator.ZIndex = 16
+
+                ContentFrame.Name = NeverLose.RandomString()
+                ContentFrame.Parent = KBFrame
+                ContentFrame.BackgroundTransparency = 1
+                ContentFrame.Position = UDim2.new(0, 0, 0, 26)
+                ContentFrame.Size = UDim2.new(1, 0, 1, -26)
+
+                UIListLayout.Parent = ContentFrame
+                UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+                local function UpdateSize()
+                        if not KBList_lb.Status then return end
+                        local targetY = 26 + UIListLayout.AbsoluteContentSize.Y
+                        NeverLose.PlayAnimate(KBFrame, SlowyTween, {
+                                Size = UDim2.new(0, 200, 0, targetY)
+                        })
+                end
+
+                UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(LPH_NO_VIRTUALIZE(UpdateSize))
+
+                NeverLose.Drag(TitleLbl, KBFrame, 0.15)
+
+                NeverLose.__KeybindsListCache = KBList_lb;
+
+                KBList_lb.Renders = {};
+                KBList_lb.Status = true;
+                
+                Shadow:Render(true)
+
+                function KBList_lb:SetRender(value)
+                        KBList_lb.Status = value;
+                        if value then
+                                local targetY = 26 + UIListLayout.AbsoluteContentSize.Y
+                                NeverLose.PlayAnimate(KBFrame, SlowyTween, {
+                                        BackgroundTransparency = 0.200,
+                                        Size = UDim2.new(0, 200, 0, targetY)
+                                })
+                                NeverLose.PlayAnimate(Stroke, SlowyTween, { Transparency = 0 })
+                                NeverLose.PlayAnimate(TitleLbl, SlowyTween, { TextTransparency = 0 })
+                                NeverLose.PlayAnimate(Separator, SlowyTween, { BackgroundTransparency = 0 })
+                                Shadow:Render(true)
+                                for _,v in pairs(KBList_lb.Renders) do pcall(v, true) end
+                        else
+                                NeverLose.PlayAnimate(KBFrame, SlowyTween, {
+                                        BackgroundTransparency = 1,
+                                        Size = UDim2.new(0, 200, 0, 0)
+                                })
+                                NeverLose.PlayAnimate(Stroke, SlowyTween, { Transparency = 1 })
+                                NeverLose.PlayAnimate(TitleLbl, SlowyTween, { TextTransparency = 1 })
+                                NeverLose.PlayAnimate(Separator, SlowyTween, { BackgroundTransparency = 1 })
+                                Shadow:Render(false)
+                                for _,v in pairs(KBList_lb.Renders) do pcall(v, false) end
+                        end
+                end
+
+                function KBList_lb:AddBind(Name, DefaultKey, DefaultState)
+                        local Bind = {}
+                        
+                        local Row = Instance.new("Frame")
+                        Row.Name = NeverLose.RandomString()
+                        Row.Parent = ContentFrame
+                        Row.BackgroundTransparency = 1
+                        Row.Size = UDim2.new(1, 0, 0, 20)
+                        
+                        local NameLbl = Instance.new("TextLabel")
+                        NameLbl.Parent = Row
+                        NameLbl.BackgroundTransparency = 1
+                        NameLbl.Position = UDim2.new(0, 10, 0, 0)
+                        NameLbl.Size = UDim2.new(1, -20, 1, 0)
+                        NameLbl.Font = Enum.Font.GothamMedium
+                        NameLbl.Text = Name
+                        NameLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+                        NameLbl.TextSize = 12
+                        NameLbl.TextXAlignment = Enum.TextXAlignment.Left
+
+                        local StateLbl = Instance.new("TextLabel")
+                        StateLbl.Parent = Row
+                        StateLbl.BackgroundTransparency = 1
+                        StateLbl.Position = UDim2.new(0, 10, 0, 0)
+                        StateLbl.Size = UDim2.new(1, -20, 1, 0)
+                        StateLbl.Font = Enum.Font.GothamMedium
+                        StateLbl.Text = "[" .. (DefaultState or "holding") .. "]"
+                        StateLbl.TextColor3 = Color3.fromRGB(150, 150, 150)
+                        StateLbl.TextSize = 12
+                        StateLbl.TextXAlignment = Enum.TextXAlignment.Right
+                        
+                        -- Reserve space for state text
+                        local KeyLbl = Instance.new("TextLabel")
+                        KeyLbl.Parent = Row
+                        KeyLbl.BackgroundTransparency = 1
+                        KeyLbl.Position = UDim2.new(0, 10, 0, 0)
+                        KeyLbl.Size = UDim2.new(1, -25, 1, 0) -- dynamically sized later
+                        KeyLbl.Font = Enum.Font.GothamBold
+                        KeyLbl.Text = DefaultKey or "None"
+                        KeyLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        KeyLbl.TextSize = 12
+                        KeyLbl.TextXAlignment = Enum.TextXAlignment.Right
+                        
+                        local function AlignRightText()
+                                local sWidth = TextService:GetTextSize(StateLbl.Text, 12, Enum.Font.GothamMedium, Vector2.new(9999, 20)).X
+                                KeyLbl.Size = UDim2.new(1, -(20 + sWidth + 5), 1, 0)
+                        end
+                        AlignRightText()
+
+                        Bind.Visible = true
+                        
+                        Bind.SetRender = LPH_NO_VIRTUALIZE(function(value)
+                                if value and Bind.Visible then
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextTransparency = 0 })
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextTransparency = 0 })
+                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextTransparency = 0 })
+                                else
+                                        NeverLose.PlayAnimate(NameLbl, SlowyTween, { TextTransparency = 1 })
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextTransparency = 1 })
+                                        NeverLose.PlayAnimate(KeyLbl, SlowyTween, { TextTransparency = 1 })
+                                end
+                        end)
+
+                        table.insert(KBList_lb.Renders, Bind.SetRender)
+
+                        function Bind:SetVisible(v)
+                                Bind.Visible = v
+                                Row.Visible = v
+                                if KBList_lb.Status then Bind.SetRender(v) end
+                                UpdateSize()
+                        end
+
+                        function Bind:SetKey(k)
+                                KeyLbl.Text = k
+                        end
+
+                        function Bind:SetState(s)
+                                StateLbl.Text = "[" .. s .. "]"
+                                if s == "on" or s == "holding" or s == "active" or s == "toggled" then
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(255, 255, 255) })
+                                else
+                                        NeverLose.PlayAnimate(StateLbl, SlowyTween, { TextColor3 = Color3.fromRGB(150, 150, 150) })
+                                end
+                                AlignRightText()
+                        end
+
+                        return Bind
+                end
+
+                return KBList_lb
+        end;
+
         Window:SetRender(false);
 
         return Window;
 end;
 
-function NeverLose:CreateNotification()
+function NeverLose:CreateNotification(positionStr)
         if NeverLose.__Notification_Cache then
                 return NeverLose.__Notification_Cache;
         end;
+
+        positionStr = positionStr or "TopRight"
 
         local Notifier = {};
         local Notification = Instance.new("Frame")
@@ -6138,16 +6381,45 @@ function NeverLose:CreateNotification()
 
         Notification.Name = NeverLose.RandomString();
         Notification.Parent = NeverLose.ScreenGui;
-        Notification.AnchorPoint = Vector2.new(1, 0)
+        
+        local slideStartX, slideEndX = 750, 1
+        local notifyAnchor = Vector2.new(1, 0)
+
+        if positionStr == "TopLeft" then
+            Notification.AnchorPoint = Vector2.new(0, 0)
+            Notification.Position = UDim2.new(0, 25, 0, 25)
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            slideStartX, slideEndX = -750, 0
+            notifyAnchor = Vector2.new(0, 0)
+        elseif positionStr == "TopCenter" then
+            Notification.AnchorPoint = Vector2.new(0.5, 0)
+            Notification.Position = UDim2.new(0.5, 0, 0, 25)
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            slideStartX, slideEndX = 0, 0.5
+            notifyAnchor = Vector2.new(0.5, 0)
+        elseif positionStr == "BottomLeft" then
+            Notification.AnchorPoint = Vector2.new(0, 1)
+            Notification.Position = UDim2.new(0, 25, 1, -25)
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            slideStartX, slideEndX = -750, 0
+            notifyAnchor = Vector2.new(0, 0)
+        elseif positionStr == "BottomRight" then
+            Notification.AnchorPoint = Vector2.new(1, 1)
+            Notification.Position = UDim2.new(1, -25, 1, -25)
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+        else -- TopRight (default)
+            Notification.AnchorPoint = Vector2.new(1, 0)
+            Notification.Position = UDim2.new(1, -25, 0, 25)
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+        end
+
         Notification.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
         Notification.BackgroundTransparency = 1.000
         Notification.BorderColor3 = Color3.fromRGB(0, 0, 0)
         Notification.BorderSizePixel = 0
-        Notification.Position = UDim2.new(1, -25, 0, 25)
         Notification.Size = UDim2.new(0, 25, 0, 25)
 
         UIListLayout.Parent = Notification
-        UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
         UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         UIListLayout.Padding = UDim.new(0, 0)
 
@@ -6187,13 +6459,13 @@ function NeverLose:CreateNotification()
 
                 NotifyFrame.Name = NeverLose.RandomString();
                 NotifyFrame.Parent = ContainerFrame
-                NotifyFrame.AnchorPoint = Vector2.new(1, 0)
+                NotifyFrame.AnchorPoint = notifyAnchor
                 NotifyFrame.BackgroundColor3 = Color3.fromRGB(20, 22, 27)
                 NotifyFrame.BackgroundTransparency = 0.075
                 NotifyFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 NotifyFrame.BorderSizePixel = 0
                 NotifyFrame.ClipsDescendants = true
-                NotifyFrame.Position = UDim2.new(0, 750, 0, 0)
+                NotifyFrame.Position = UDim2.new(0, slideStartX, 0, 0)
                 NotifyFrame.Size = UDim2.new(0, 220, 0, 55)
                 NotifyFrame.ZIndex = 130
 
@@ -6259,8 +6531,16 @@ function NeverLose:CreateNotification()
                 NotifyFrame.Size = UDim2.new(0, MainSize + 65, 0, 55);
 
                 shadow:Render(true)
+                
+                local animTargetPos = UDim2.new(slideEndX, 0, 0, 0)
+                if positionStr == "TopCenter" then
+                    -- slide down effect instead of side for center
+                    NotifyFrame.Position = UDim2.new(0.5, 0, 0, -150)
+                    animTargetPos = UDim2.new(0.5, 0, 0, 0)
+                end
+
                 NeverLose.PlayAnimate(NotifyFrame , VSlowTween , {
-                        Position = UDim2.new(1, 0, 0, 0)
+                        Position = animTargetPos
                 })
 
                 ContainerFrame.Size = UDim2.new(0, 0, 0, 65)
