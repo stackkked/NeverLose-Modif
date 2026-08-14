@@ -206,8 +206,8 @@ NeverLose.NameRegisitry = {};
 NeverLose.IsMosueOverOtherFrame = false;
 NeverLose.GlobalLogo = "rbxassetid://120358385035996";
 NeverLose.ImageColorMapping = "rbxassetid://4155801252";
-NeverLose.MainFont = NeverLose.MainFont;
-NeverLose.MainFontBold = NeverLose.MainFontBold;
+NeverLose.MainFont = Enum.Font.GothamMedium;
+NeverLose.MainFontBold = Enum.Font.GothamBold;
 
 if getcustomasset then
         local link = "https://github.com/4lpaca-pin/NeverLose/blob/main/assets/%s?raw=true";
